@@ -108,8 +108,6 @@ app.put("/api/auth/change-password", auth, (req, res) => {
   res.json({ ok: true, token });
 });
 
-/* ============ RANK-INFO (statisch, für Frontend) ============ */
-app.get("/api/rank-info", auth, (req, res) => res.json({ ebenen: DB.EBENEN, rolesOrdered: DB.allRolesOrdered() }));
 
 /* ============ TEAM-ÜBERSICHT ============ */
 app.get("/api/team", auth, (req, res) => {
@@ -551,6 +549,34 @@ app.put("/api/absences/:id", auth, requireLevel(3), (req, res) => {
   notify(db, a.userId, `📋 Deine Abwesenheit wurde ${req.body.status === "approved" ? "genehmigt ✅" : "abgelehnt ❌"}.`);
   DB.save(db);
   res.json({ absence: a });
+});
+
+
+
+/* ============ PROFIL-STATISTIK ============ */
+app.get("/api/profile/stats", auth, (req, res) => {
+  const db = req.db, me = req.user.username;
+  const mine = db.shifts.filter(s => s.userId === req.user.id);
+  let ms = 0;
+  mine.forEach(s => { if (s.endTime) ms += new Date(s.endTime) - new Date(s.startTime); });
+  res.json({
+    shifts: mine.length,
+    workMs: ms,
+    warns: db.warns.filter(w => w.moderator === me).length,
+    bans: db.bans.filter(b => b.moderator === me).length,
+  });
+});
+
+/* ============ RANG-INFO (editierbar) ============ */
+app.get("/api/rank-info", auth, (req, res) => {
+  res.json({ ebenen: req.db.settings.rankInfo || DB.EBENEN, rolesOrdered: DB.allRolesOrdered() });
+});
+app.put("/api/rank-info", auth, requireLevel(6), (req, res) => {
+  const db = req.db;
+  db.settings.rankInfo = req.body.ebenen;
+  log(db, req.user, "Rang-Info bearbeitet", "-");
+  DB.save(db);
+  res.json({ ok: true });
 });
 
 app.listen(PORT, () => console.log(`🚨 Notruf Hamburg Verwaltung läuft auf Port ${PORT}`));

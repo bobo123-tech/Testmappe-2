@@ -1,0 +1,598 @@
+{
+  "users": [
+    {
+      "id": "u_mu77q0vcmx99sb",
+      "username": "Chris",
+      "passwordHash": "$2a$10$iMW6zsUiUuZxJDcfCv1Fk.6pwlRac7PIjNhavXiqefd1wK/oSR6oi",
+      "discord": "@Chris",
+      "discordId": "999999999999999999",
+      "role": "Entwickler",
+      "isDeveloper": true,
+      "active": true,
+      "tokenVersion": 1,
+      "createdAt": "2024-01-01"
+    }
+  ],
+  "players": [
+    {
+      "id": "p_mu77q1nuhl26kv",
+      "robloxName": "xXPoliceMaxXx",
+      "discordName": "@MaxSpieler",
+      "discordId": "200000000000000001",
+      "role": "Bürger",
+      "createdAt": "2024-03-01"
+    },
+    {
+      "id": "p_mu77q1nuy75zkt",
+      "robloxName": "Störenfried99",
+      "discordName": "@Chaot99",
+      "discordId": "200000000000000002",
+      "role": "Bürger",
+      "createdAt": "2024-05-02"
+    },
+    {
+      "id": "p_mu77q1numglc5m",
+      "robloxName": "RegelbrecherX",
+      "discordName": "@RegelbrecherX",
+      "discordId": "200000000000000003",
+      "role": "Bürger",
+      "createdAt": "2024-06-01"
+    },
+    {
+      "id": "p_mu77q1nulsrp42",
+      "robloxName": "PolizeiJulia",
+      "discordName": "@JuliaPD",
+      "discordId": "200000000000000004",
+      "role": "Ausbilder",
+      "createdAt": "2024-04-20"
+    },
+    {
+      "id": "p_mu77q1nu7cgfef",
+      "robloxName": "FeuerLisa07",
+      "discordName": "@LisaFire",
+      "discordId": "200000000000000005",
+      "role": "Bürger",
+      "createdAt": "2024-03-05"
+    }
+  ],
+  "warns": [
+    {
+      "id": "w_mu77q1nutp5iwp",
+      "playerId": "p_mu77q1nuy75zkt",
+      "player": "Störenfried99",
+      "reason": "RDM (Random Deathmatch)",
+      "date": "2024-07-01",
+      "time": "18:20",
+      "moderator": "MaxAdmin",
+      "note": ""
+    },
+    {
+      "id": "w_mu77q1nu0pz6y5",
+      "playerId": "p_mu77q1numglc5m",
+      "player": "RegelbrecherX",
+      "reason": "Fail-RP",
+      "date": "2024-07-03",
+      "time": "20:11",
+      "moderator": "LenaJrMod",
+      "note": ""
+    }
+  ],
+  "bans": [
+    {
+      "id": "b_mu77q1nueai9er",
+      "playerId": "p_mu77q1numglc5m",
+      "player": "RegelbrecherX",
+      "reason": "Cheating / Exploiting",
+      "type": "permanent",
+      "startDate": "2024-08-01",
+      "startTime": "14:00",
+      "duration": null,
+      "durationUnit": null,
+      "endDateTime": null,
+      "moderator": "HeadAdminJan",
+      "note": "Beweise Ticket #4521"
+    },
+    {
+      "id": "b_mu77q1nudcces5",
+      "playerId": "p_mu77q1nuy75zkt",
+      "player": "Störenfried99",
+      "reason": "Massives RDM nach Verwarnung",
+      "type": "temporary",
+      "startDate": "2024-08-16",
+      "startTime": "18:30",
+      "duration": 7,
+      "durationUnit": "days",
+      "endDateTime": "2024-08-23T18:30:00.000Z",
+      "moderator": "MaxAdmin",
+      "note": ""
+    }
+  ],
+  "blacklist": [
+    {
+      "id": "bl_mu77q1nucqarl2",
+      "name": "ScammerFritz",
+      "discordId": "300000000000000001",
+      "reason": "Betrug bei Bewerbung / Fake-Angaben",
+      "addedBy": "TimProjekt",
+      "date": "2024-06-01"
+    }
+  ],
+  "rights": [
+    {
+      "id": "r_mu77q1nuvha7xa",
+      "discordName": "@JuliaPD",
+      "discordId": "200000000000000004",
+      "robloxName": "PolizeiJulia",
+      "role": "Ausbilder",
+      "assignedBy": "TimProjekt",
+      "date": "2024-04-20"
+    }
+  ],
+  "logs": [
+    {
+      "id": "l_mu7abxt08ixhgl",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "TestNeuling",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755696613
+    },
+    {
+      "id": "l_mu7abwoxrqqgtq",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "LisaSupporter",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755695169
+    },
+    {
+      "id": "l_mu7abucwymwxa2",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "MaxOwner",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755692144
+    },
+    {
+      "id": "l_mu7abt2zj7al5d",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "AnnaCoOwner",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755690491
+    },
+    {
+      "id": "l_mu7abrf6cxe2sw",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "TomHeadMod",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755688338
+    },
+    {
+      "id": "l_mu7abpfui17bcg",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "LenaJrMod",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755685771
+    },
+    {
+      "id": "l_mu7abagjgwx4d0",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "HeadAdminJan",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755666355
+    },
+    {
+      "id": "l_mu7ab93g15njgw",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "MaxAdmin",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755664588
+    },
+    {
+      "id": "l_mu7ab7ts435dpn",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "SaraTeamleitung",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755662944
+    },
+    {
+      "id": "l_mu7ab5razxa403",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "TimProjekt",
+      "date": "18.9.2026",
+      "time": "18:21",
+      "ts": 1789755660262
+    },
+    {
+      "id": "l_mu7ab47wzbrnza",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "PhilManager",
+      "date": "18.9.2026",
+      "time": "18:20",
+      "ts": 1789755658268
+    },
+    {
+      "id": "l_mu7ab2rmwfi6ta",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Benutzer gelöscht",
+      "target": "NinaServer",
+      "date": "18.9.2026",
+      "time": "18:20",
+      "ts": 1789755656386
+    },
+    {
+      "id": "l_mu7a8wxu46z7wg",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Login",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "18:19",
+      "ts": 1789755555522
+    },
+    {
+      "id": "l_mu7a7me0uj7otd",
+      "user": "LenaJrMod",
+      "role": "Jr. Mod",
+      "action": "Login",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "18:18",
+      "ts": 1789755495192
+    },
+    {
+      "id": "l_mu7a5ccmqh0ufn",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Logout",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "18:16",
+      "ts": 1789755388870
+    },
+    {
+      "id": "l_mu79nk7vnsizyv",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Inhalt erstellt (handbook)",
+      "target": "Teest",
+      "date": "18.9.2026",
+      "time": "18:02",
+      "ts": 1789754559259
+    },
+    {
+      "id": "l_mu79n8fnnnzqfk",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Inhalt gelöscht (handbook)",
+      "target": "c_mu77q1nu1ow35n",
+      "date": "18.9.2026",
+      "time": "18:02",
+      "ts": 1789754543987
+    },
+    {
+      "id": "l_mu79ibw4dcz9di",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Schicht beendet",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:58",
+      "ts": 1789754315188
+    },
+    {
+      "id": "l_mu79i4ccpvdpex",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Login",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:58",
+      "ts": 1789754305404
+    },
+    {
+      "id": "l_mu789gij8y0ib9",
+      "user": "LisaSupporter",
+      "role": "Supporter",
+      "action": "Login",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:23",
+      "ts": 1789752221659
+    },
+    {
+      "id": "l_mu788vc2pey2q6",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Logout",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:23",
+      "ts": 1789752194210
+    },
+    {
+      "id": "l_mu7869gtc5c0zi",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Login",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:21",
+      "ts": 1789752072557
+    },
+    {
+      "id": "l_mu785vgiplsq1f",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Logout",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:20",
+      "ts": 1789752054402
+    },
+    {
+      "id": "l_mu781am6yladnn",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Schicht-Check bestätigt",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:17",
+      "ts": 1789751840766
+    },
+    {
+      "id": "l_mu780vrlcdj1ii",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Schicht-Check bestätigt",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:17",
+      "ts": 1789751821521
+    },
+    {
+      "id": "l_mu780vgua0fk6p",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Schicht-Check bestätigt",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:17",
+      "ts": 1789751821134
+    },
+    {
+      "id": "l_mu780uwe9mzube",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Schicht-Check bestätigt",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:17",
+      "ts": 1789751820398
+    },
+    {
+      "id": "l_mu780u5fo3bqrb",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Schicht-Check bestätigt",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:16",
+      "ts": 1789751819427
+    },
+    {
+      "id": "l_mu780llvf4slh8",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Schicht gestartet",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:16",
+      "ts": 1789751808355
+    },
+    {
+      "id": "l_mu780941u2x4zt",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "Login",
+      "target": "-",
+      "date": "18.9.2026",
+      "time": "17:16",
+      "ts": 1789751792161
+    },
+    {
+      "id": "l_mu77q1nuvweqxz",
+      "user": "MaxAdmin",
+      "role": "Admin",
+      "action": "Warn erstellt",
+      "target": "Störenfried99",
+      "date": "01.07.2024",
+      "time": "18:20",
+      "ts": 1789750415946
+    },
+    {
+      "id": "l_mu77q1nucmdz2j",
+      "user": "HeadAdminJan",
+      "role": "Head Administrator",
+      "action": "Ban erstellt",
+      "target": "RegelbrecherX",
+      "date": "01.08.2024",
+      "time": "14:00",
+      "ts": 1789750515946
+    },
+    {
+      "id": "l_mu77q1nuo453ll",
+      "user": "Chris",
+      "role": "Entwickler",
+      "action": "System initialisiert",
+      "target": "-",
+      "date": "01.01.2024",
+      "time": "00:00",
+      "ts": 1789750615946
+    }
+  ],
+  "contents": [
+    {
+      "id": "c_mu79nk7vslj8jo",
+      "type": "handbook",
+      "title": "Teest",
+      "body": "Test",
+      "pinned": false,
+      "author": "Chris",
+      "date": "2026-09-18"
+    },
+    {
+      "id": "c_mu77q1nueiu1cx",
+      "type": "announcement",
+      "title": "Willkommen im neuen Verwaltungspanel!",
+      "body": "Das Notruf Hamburg Verwaltungspanel wurde komplett überarbeitet – mit neuem Design, Backend und Schicht-System.",
+      "author": "Chris",
+      "date": "2024-08-01",
+      "pinned": true
+    },
+    {
+      "id": "c_mu77q1numpj4yt",
+      "type": "rules",
+      "title": "Verhaltensregeln im Team",
+      "body": "- Respektvoller Umgang\n- Keine Bevorzugung von Freunden\n- Regelmäßige Schichten\n- Vertraulichkeit von internen Informationen",
+      "author": "Chris",
+      "date": "2024-01-01",
+      "pinned": false
+    },
+    {
+      "id": "c_mu77q1nuf8i0b4",
+      "type": "document",
+      "title": "Bewerbungsleitfaden Team",
+      "body": "Alle Infos rund um Bewerbungen findest du im Discord-Kanal #bewerbungen.",
+      "author": "TimProjekt",
+      "date": "2024-02-01",
+      "pinned": false
+    },
+    {
+      "id": "c_mu77q1nupb29mi",
+      "type": "changelog",
+      "title": "v1.0 – Release",
+      "body": "Erstveröffentlichung des neuen Verwaltungspanels mit Backend, API, Schicht-System und neuer Ebenen-Hierarchie.",
+      "author": "Chris",
+      "date": "2024-08-16",
+      "pinned": false
+    }
+  ],
+  "absences": [],
+  "notifications": [],
+  "ipLogs": [
+    {
+      "id": "ip_mu7a8wxusk5di5",
+      "userId": "u_mu77q0vcmx99sb",
+      "username": "Chris",
+      "ip": "::1",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "date": "18.9.2026, 18:19:15"
+    },
+    {
+      "id": "ip_mu7a7me07v4dh2",
+      "userId": "u_mu77q1fiugbq3y",
+      "username": "LenaJrMod",
+      "ip": "::1",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36 Avast/151.0.0.0",
+      "date": "18.9.2026, 18:18:15"
+    },
+    {
+      "id": "ip_mu79i4ccha73uu",
+      "userId": "u_mu77q0vcmx99sb",
+      "username": "Chris",
+      "ip": "::1",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "date": "18.9.2026, 17:58:25"
+    },
+    {
+      "id": "ip_mu789gijlhoqtd",
+      "userId": "u_mu77q1jocf83um",
+      "username": "LisaSupporter",
+      "ip": "::1",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "date": "18.9.2026, 17:23:41"
+    },
+    {
+      "id": "ip_mu7869gthij1wt",
+      "userId": "u_mu77q0vcmx99sb",
+      "username": "Chris",
+      "ip": "::1",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "date": "18.9.2026, 17:21:12"
+    },
+    {
+      "id": "ip_mu7808gvhri9hg",
+      "userId": "u_mu77q0vcmx99sb",
+      "username": "Chris",
+      "ip": "::1",
+      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/153.0.0.0 Safari/537.36",
+      "date": "18.9.2026, 17:16:31"
+    }
+  ],
+  "shifts": [
+    {
+      "id": "s_mu780llv2hasoe",
+      "userId": "u_mu77q0vcmx99sb",
+      "username": "Chris",
+      "role": "Entwickler",
+      "startTime": "2026-09-18T17:16:48.355Z",
+      "endTime": "2026-09-18T17:58:35.188Z",
+      "status": "ended",
+      "lastConfirm": "2026-09-18T17:17:20.766Z",
+      "nextDeadline": "2026-09-18T18:17:20.766Z",
+      "confirmCount": 5,
+      "cooldownUntil": "2026-09-18T18:08:35.188Z"
+    }
+  ],
+  "settings": {
+    "maintenance": false,
+    "systemStatus": [
+      {
+        "name": "Webseite",
+        "status": "online"
+      },
+      {
+        "name": "Datenbank",
+        "status": "online"
+      },
+      {
+        "name": "Discord-Bot",
+        "status": "online"
+      },
+      {
+        "name": "Roblox-Schnittstelle",
+        "status": "online"
+      }
+    ]
+  }
+}

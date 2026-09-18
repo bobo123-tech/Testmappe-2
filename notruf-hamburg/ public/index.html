@@ -1,0 +1,1185 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Notruf Hamburg | Verwaltungspanel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="data:,">
+<style>
+:root{
+  --bg:#070a0e; --bg2:#0b0f14; --card:rgba(255,255,255,.045); --card-b:rgba(255,255,255,.08);
+  --green:#22c55e; --green-dark:#15803d; --green-glow:rgba(34,197,94,.35);
+  --text:#e9edf5; --dim:#8a93a8; --danger:#e74c3c; --warning:#f5a623; --blue:#2f6fed;
+  --radius:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.hidden{display:none !important;}
+a{color:inherit;text-decoration:none;}
+::-webkit-scrollbar{width:9px;height:9px;}
+::-webkit-scrollbar-thumb{background:#1c2530;border-radius:8px;}
+::-webkit-scrollbar-track{background:transparent;}
+
+/* ============ LOGIN (Split-Screen wie Screenshot) ============ */
+#loginPage{min-height:100vh;display:flex;}
+.login-left{
+  flex:1.1; position:relative; background:
+  linear-gradient(180deg,rgba(4,6,10,.35),rgba(4,6,10,.85)),
+  url('https://images.unsplash.com/photo-1601987177651-8edfe6c20009?q=80&w=1600&auto=format&fit=crop') center/cover no-repeat;
+  display:flex; align-items:flex-end; padding:50px;
+}
+.login-left .brand{position:relative;z-index:2;}
+.login-left .brand .icon{font-size:34px;margin-bottom:6px;filter:drop-shadow(0 0 10px var(--green-glow));}
+.login-left .brand h1{font-size:32px;font-weight:800;color:#fff;}
+.login-left .brand p{color:#c7cfdd;font-size:14px;max-width:420px;margin-top:8px;line-height:1.5;}
+.login-right{
+  flex:0.9; min-width:420px; background:var(--bg2); display:flex; flex-direction:column;
+  align-items:center; justify-content:center; padding:40px; position:relative;
+}
+.mrp-logo-box{
+  width:280px;height:150px;border-radius:16px;
+  background:radial-gradient(circle at 50% 60%,rgba(34,197,94,.35),rgba(0,0,0,.9) 70%);
+  border:1px solid rgba(34,197,94,.4); display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 60px rgba(34,197,94,.25); margin-bottom:30px;
+}
+.mrp-logo-box svg{filter:drop-shadow(0 0 14px rgba(34,197,94,.6));}
+.login-form-box{width:340px;max-width:90vw;}
+.login-form-box h2{font-size:22px;font-weight:800;margin-bottom:4px;}
+.login-form-box .sub{color:var(--dim);font-size:13px;margin-bottom:22px;}
+.login-error{background:rgba(231,76,60,.15);border:1px solid rgba(231,76,60,.4);color:#ff8a7a;padding:10px 13px;border-radius:10px;font-size:13px;margin-bottom:16px;}
+.form-group{margin-bottom:16px;}
+.form-group label{display:block;font-size:12.5px;color:var(--dim);margin-bottom:6px;font-weight:700;}
+.input,.select,textarea{
+  width:100%;padding:12px 14px;border-radius:11px;border:1px solid var(--card-b);
+  background:rgba(255,255,255,.03);color:var(--text);font-size:14px;outline:none;transition:.2s;
+}
+.input:focus,.select:focus,textarea:focus{border-color:var(--green);background:rgba(34,197,94,.06);box-shadow:0 0 0 3px rgba(34,197,94,.15);}
+textarea{resize:vertical;min-height:80px;}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.btn{border:none;padding:12px 18px;border-radius:11px;cursor:pointer;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:8px;transition:.2s;}
+.btn:active{transform:scale(.96);}
+.btn-green{background:linear-gradient(135deg,var(--green),var(--green-dark));color:#04170a;box-shadow:0 8px 22px rgba(34,197,94,.35);}
+.btn-green:hover{filter:brightness(1.1);}
+.btn-ghost{background:rgba(255,255,255,.06);color:var(--text);border:1px solid var(--card-b);}
+.btn-ghost:hover{background:rgba(255,255,255,.11);}
+.btn-red{background:linear-gradient(135deg,#e74c3c,#a5281c);color:#fff;}
+.btn-full{width:100%;justify-content:center;}
+.btn-sm{padding:6px 11px;font-size:12px;border-radius:8px;}
+.login-footer{margin-top:26px;font-size:11.5px;color:var(--dim);text-align:center;}
+.login-footer b{color:var(--green);}
+.demo-box{margin-top:18px;padding:12px 14px;border-radius:12px;background:rgba(255,255,255,.03);border:1px dashed var(--card-b);font-size:11px;color:var(--dim);line-height:1.7;}
+.demo-box b{color:#b8c2d6;}
+
+/* ============ APP SHELL ============ */
+#app{display:flex;min-height:100vh;}
+#sidebar{width:270px;min-width:270px;background:linear-gradient(180deg,#0a0d12,#070a0e);border-right:1px solid var(--card-b);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:50;}
+.sidebar-head{padding:20px;border-bottom:1px solid var(--card-b);display:flex;gap:10px;align-items:center;}
+.sidebar-head .icon{font-size:22px;filter:drop-shadow(0 0 8px var(--green-glow));}
+.sidebar-head h1{font-size:14.5px;font-weight:800;}
+.sidebar-head span{font-size:10px;color:var(--dim);letter-spacing:.5px;}
+.nav{flex:1;padding:14px 10px;overflow-y:auto;}
+.nav-item{display:flex;align-items:center;gap:11px;padding:10px 13px;border-radius:10px;margin-bottom:2px;cursor:pointer;color:var(--dim);font-size:13px;font-weight:600;border-left:3px solid transparent;transition:.18s;}
+.nav-item:hover{background:rgba(255,255,255,.05);color:#fff;}
+.nav-item.active{background:linear-gradient(90deg,rgba(34,197,94,.18),transparent);color:#fff;border-left:3px solid var(--green);}
+.nav-icon{width:18px;text-align:center;}
+.sidebar-foot{padding:12px;border-top:1px solid var(--card-b);}
+#mainArea{flex:1;display:flex;flex-direction:column;min-width:0;}
+#topbar{height:64px;border-bottom:1px solid var(--card-b);display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(7,10,14,.7);backdrop-filter:blur(10px);position:sticky;top:0;z-index:40;gap:18px;}
+#globalSearch{max-width:360px;}
+.menuBtn{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;}
+.profile-chip{display:flex;align-items:center;gap:10px;padding:5px 12px 5px 5px;border-radius:30px;background:rgba(255,255,255,.05);border:1px solid var(--card-b);cursor:pointer;position:relative;}
+.avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--green-dark));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12.5px;color:#04170a;}
+.profile-chip .pname{font-size:12.5px;font-weight:700;}
+.profile-chip .prole{font-size:10px;color:var(--dim);}
+.dev-badge{background:linear-gradient(135deg,#f59e0b,#b45309);color:#1a0f00;font-size:9px;font-weight:800;padding:2px 7px;border-radius:20px;margin-left:6px;}
+#content{padding:24px;flex:1;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* ============ CARDS ============ */
+.glass{background:var(--card);border:1px solid var(--card-b);border-radius:var(--radius);backdrop-filter:blur(14px);box-shadow:0 10px 30px rgba(0,0,0,.3);}
+.page-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
+.page-title h2{font-size:21px;font-weight:800;}
+.page-title p{font-size:12.5px;color:var(--dim);margin-top:2px;}
+.section-label{font-size:11px;font-weight:800;letter-spacing:1px;color:var(--green);margin:22px 0 12px;text-transform:uppercase;}
+.section-label:first-child{margin-top:0;}
+.tiles-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+.tile{padding:18px;display:flex;gap:14px;align-items:center;cursor:pointer;transition:.2s;}
+.tile:hover{transform:translateY(-3px);border-color:rgba(34,197,94,.4);box-shadow:0 10px 26px rgba(34,197,94,.12);}
+.tile-icon{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(21,128,61,.25));display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.tile h4{font-size:14px;font-weight:700;}
+.tile p{font-size:11.5px;color:var(--dim);}
+.badge-inline{position:absolute;top:12px;right:12px;background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.4);font-size:10px;padding:3px 8px;border-radius:20px;font-weight:700;}
+
+.hero{border-radius:20px;overflow:hidden;position:relative;margin-bottom:22px;min-height:120px;display:flex;align-items:center;
+  background:linear-gradient(120deg,rgba(34,197,94,.2),rgba(0,0,0,.4)),url('https://images.unsplash.com/photo-1560969184-10fe8719e047?q=80&w=1600&auto=format&fit=crop') center/cover;
+  padding:26px 32px;border:1px solid var(--card-b);}
+.hero h2{font-size:22px;margin-bottom:4px;}
+.hero p{color:#dfe3ec;font-size:13px;}
+.hero .badge-role{display:inline-block;margin-top:10px;background:rgba(34,197,94,.18);border:1px solid rgba(34,197,94,.45);color:var(--green);padding:5px 12px;border-radius:20px;font-size:12px;font-weight:700;}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:16px;margin-bottom:22px;}
+.stat-card{padding:18px;transition:.2s;}
+.stat-card:hover{transform:translateY(-3px);}
+.stat-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:12px;background:rgba(34,197,94,.15);color:var(--green);}
+.stat-num{font-size:24px;font-weight:800;}
+.stat-label{font-size:12px;color:var(--dim);margin-top:2px;}
+
+.grid2{display:grid;grid-template-columns:1.4fr 1fr;gap:18px;}
+.card-title{font-size:13.5px;font-weight:700;padding:16px 18px;border-bottom:1px solid var(--card-b);display:flex;justify-content:space-between;align-items:center;}
+.activity-item{padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12.5px;display:flex;gap:9px;}
+.activity-item:last-child{border:none;}
+.activity-dot{width:7px;height:7px;border-radius:50%;background:var(--green);margin-top:5px;flex-shrink:0;box-shadow:0 0 6px var(--green-glow);}
+.activity-item .meta{color:var(--dim);font-size:10.5px;margin-top:2px;}
+
+/* ============ TABLE ============ */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;align-items:center;}
+.toolbar .input,.toolbar .select{width:auto;min-width:160px;}
+.table-wrap{overflow-x:auto;border-radius:var(--radius);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead th{text-align:left;padding:12px 15px;background:rgba(255,255,255,.04);color:var(--dim);font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap;}
+tbody td{padding:12px 15px;border-bottom:1px solid rgba(255,255,255,.05);white-space:nowrap;}
+tbody tr:hover{background:rgba(255,255,255,.03);}
+td.empty{text-align:center;color:var(--dim);padding:32px;white-space:normal;}
+.pagination{display:flex;gap:6px;justify-content:flex-end;padding:14px 4px;flex-wrap:wrap;}
+.pagination button{width:30px;height:30px;border-radius:8px;border:1px solid var(--card-b);background:rgba(255,255,255,.03);color:var(--text);cursor:pointer;}
+.pagination button.active{background:var(--green);border-color:var(--green);color:#04170a;font-weight:700;}
+
+/* ============ BADGES ============ */
+.badge{display:inline-block;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap;}
+.badge-green{background:rgba(34,197,94,.15);color:var(--green);border:1px solid rgba(34,197,94,.4);}
+.badge-gold{background:rgba(255,196,0,.15);color:#ffc400;border:1px solid rgba(255,196,0,.4);}
+.badge-blue{background:rgba(47,111,237,.15);color:#6ea8ff;border:1px solid rgba(47,111,237,.4);}
+.badge-gray{background:rgba(255,255,255,.08);color:#aab2c0;border:1px solid rgba(255,255,255,.15);}
+.badge-red{background:rgba(231,76,60,.15);color:#ff6b5b;border:1px solid rgba(231,76,60,.4);}
+.badge-purple{background:rgba(155,89,255,.15);color:#b98bff;border:1px solid rgba(155,89,255,.4);}
+
+/* ============ MODAL / TOAST ============ */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:200;}
+.modal-overlay.active{display:flex;animation:fadeIn .2s ease;}
+.modal-box{width:460px;max-width:92vw;max-height:88vh;overflow-y:auto;padding:24px;}
+.modal-box h3{margin-bottom:16px;font-size:16px;}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:16px;}
+#toastContainer{position:fixed;bottom:20px;right:20px;z-index:300;display:flex;flex-direction:column;gap:10px;}
+.toast{padding:13px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 10px 30px rgba(0,0,0,.4);animation:slideIn .3s ease;min-width:220px;}
+@keyframes slideIn{from{opacity:0;transform:translateX(40px);}to{opacity:1;transform:translateX(0);}}
+.toast.success{background:linear-gradient(135deg,#166534,#0f3d20);border:1px solid rgba(34,197,94,.5);}
+.toast.error{background:linear-gradient(135deg,#6b1f18,#4a1310);border:1px solid rgba(231,76,60,.5);}
+.toast.info{background:linear-gradient(135deg,#1a3a6b,#122a4d);border:1px solid rgba(47,111,237,.5);}
+
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+.tab-btn{padding:9px 15px;border-radius:10px;border:1px solid var(--card-b);background:rgba(255,255,255,.03);cursor:pointer;font-size:12.5px;font-weight:600;color:var(--dim);}
+.tab-btn.active{background:var(--green);color:#04170a;border-color:var(--green);font-weight:700;}
+
+/* ============ SCHICHT-SYSTEM ============ */
+.shift-hero{padding:30px;text-align:center;position:relative;overflow:hidden;}
+.shift-ring{width:190px;height:190px;border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center;position:relative;
+  background:conic-gradient(var(--green) calc(var(--pct,0)*1%), rgba(255,255,255,.08) 0);}
+.shift-ring::before{content:"";position:absolute;inset:10px;border-radius:50%;background:var(--bg2);}
+.shift-ring .ring-inner{position:relative;z-index:2;text-align:center;}
+.shift-ring .ring-inner .time{font-size:26px;font-weight:800;}
+.shift-ring .ring-inner .label{font-size:11px;color:var(--dim);}
+.shift-status-badge{display:inline-block;padding:6px 16px;border-radius:20px;font-weight:700;font-size:12.5px;margin-bottom:16px;}
+.status-active{background:rgba(34,197,94,.18);color:var(--green);border:1px solid rgba(34,197,94,.5);}
+.status-ended{background:rgba(255,255,255,.08);color:var(--dim);border:1px solid var(--card-b);}
+.status-cooldown{background:rgba(245,166,35,.15);color:var(--warning);border:1px solid rgba(245,166,35,.4);}
+.big-confirm-btn{font-size:16px;padding:16px 36px;border-radius:16px;}
+
+/* ============ RANK INFO ============ */
+.rank-ebene-card{padding:20px;margin-bottom:14px;}
+.rank-ebene-card .ebene-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+.rank-ebene-card .ebene-head h4{font-size:15px;font-weight:800;}
+.rank-role-list{display:flex;gap:8px;flex-wrap:wrap;}
+.rank-role-chip{padding:6px 13px;border-radius:20px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.25);font-size:12px;font-weight:600;}
+
+@media(max-width:900px){
+  #sidebar{position:fixed;left:-280px;top:0;transition:.3s;box-shadow:0 0 40px rgba(0,0,0,.6);}
+  #sidebar.open{left:0;}
+  .menuBtn{display:block;}
+  .grid2{grid-template-columns:1fr;}
+  #globalSearch{display:none;}
+  .row2{grid-template-columns:1fr;}
+  .login-left{display:none;}
+  .login-right{min-width:100%;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOGIN ===================== -->
+<div id="loginPage">
+  <div class="login-left">
+    <div class="brand">
+      <div class="icon">🚨</div>
+      <h1>Notruf Hamburg</h1>
+      <p>Offizielles Verwaltungspanel für Team, Moderation und Ingame-Rechte des Roblox-RP-Projekts.</p>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="mrp-logo-box">
+      <svg width="180" height="70" viewBox="0 0 180 70">
+        <polygon points="20,60 40,10 50,10 30,60" fill="#4ade80"/>
+        <polygon points="40,60 60,10 70,10 50,60" fill="#ffffff"/>
+        <text x="80" y="46" font-family="Arial" font-size="34" font-weight="900" fill="#4ade80">M</text>
+        <text x="112" y="46" font-family="Arial" font-size="34" font-weight="900" fill="#ffffff">RP</text>
+      </svg>
+    </div>
+    <div class="login-form-box">
+      <h2>Anmeldung</h2>
+      <p class="sub">Melde dich mit deinem Team-Konto an.</p>
+      <div id="loginErrorBox"></div>
+      <form onsubmit="return handleLogin(event)">
+        <div class="form-group">
+          <label>Benutzername</label>
+          <input class="input" id="loginUser" placeholder="z. B. Christopher" required>
+        </div>
+        <div class="form-group">
+          <label>Passwort</label>
+          <input class="input" id="loginPass" type="password" placeholder="••••••••" required>
+        </div>
+        <button class="btn btn-green btn-full" type="submit">🛡️ Anmelden</button>
+      </form>
+      <div class="demo-box">
+        <b>Demo-Zugänge:</b><br>
+        Entwickler: Chris / mrpRHVO1<br>
+        Owner: MaxOwner / owner123<br>
+        Teamleitung: SaraTeamleitung / team123<br>
+        Admin: MaxAdmin / admin123<br>
+        Jr. Mod: LenaJrMod / jrmod123<br>
+        Supporter: LisaSupporter / supporter123
+      </div>
+      <div class="login-footer">© 2026 Notruf Hamburg · Entwickelt von <b>Christopher</b></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== APP ===================== -->
+<div id="app" class="hidden">
+  <aside id="sidebar">
+    <div class="sidebar-head">
+      <div class="icon">🚨</div>
+      <div><h1>Notruf Hamburg</h1><span>VERWALTUNGSPANEL</span></div>
+    </div>
+    <nav class="nav" id="navMenu"></nav>
+    <div class="sidebar-foot">
+      <button class="btn btn-ghost btn-full" onclick="logout()">🚪 Logout</button>
+    </div>
+  </aside>
+  <div id="mainArea">
+    <header id="topbar">
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="menuBtn" onclick="document.getElementById('sidebar').classList.toggle('open')">☰</button>
+        <input class="input" id="globalSearch" placeholder="🔍 Alles durchsuchen (Spieler, Discord, ID, Grund)..." onkeypress="if(event.key==='Enter')globalSearchGo()">
+      </div>
+      <div class="profile-chip" onclick="location.hash='profile'">
+        <div class="avatar" id="topAvatar"></div>
+        <div>
+          <div class="pname" id="topName"></div>
+          <div class="prole" id="topRole"></div>
+        </div>
+      </div>
+    </header>
+    <main id="content"></main>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modalOverlay"></div>
+<div id="toastContainer"></div>
+
+<script>
+/* ================= RANK / EBENEN (Frontend-Spiegel des Backends) ================= */
+const EBENEN = [
+  { key:"supporter", name:"Supporter", level:1, icon:"🎧", roles:["Test Supporter","Supporter","Head Supporter"] },
+  { key:"moderator", name:"Moderator", level:2, icon:"🛠️", roles:["Jr. Mod","Mod","Head Mod"] },
+  { key:"admin", name:"Low Team Ebene – Administrator", level:3, icon:"🛡️", roles:["Jr. Admin","Admin","Sr. Administrator","Head Administrator","LTD.Administrator"] },
+  { key:"highteam", name:"Highteam", level:4, icon:"⭐", roles:["Stv. Teamleitung","Teamleitung","LTD.Teamleitung","Stv. Servermanagement","Servermanagement","Designing Manager","Stv. Manager","Manager"] },
+  { key:"highrank", name:"High Rank", level:5, icon:"👑", roles:["Stv. Serverleitung","Serverleitung","Stv. Projektleitung","Projektleitung"] },
+  { key:"leitung", name:"Leitungsebene", level:6, icon:"💎", roles:["Supervisor","Co. Owner","Owner"] },
+];
+function ebeneOf(role){ if(role==="Entwickler") return {key:"dev",name:"Entwickler",level:99,icon:"👨‍💻",roles:["Entwickler"]}; return EBENEN.find(e=>e.roles.includes(role))||EBENEN[0]; }
+function levelOf(role){ return ebeneOf(role).level; }
+function roleBadgeClass(role){
+  const l=levelOf(role);
+  if(role==="Entwickler") return "badge-gold";
+  if(l>=6) return "badge-gold";
+  if(l>=4) return "badge-purple";
+  if(l>=2) return "badge-blue";
+  return "badge-gray";
+}
+function allRolesOrdered(){ return [...EBENEN].reverse().flatMap(e=>e.roles); }
+function canEditRole(user,targetRole){ if(user.isDeveloper) return true; return levelOf(user.role) > levelOf(targetRole); }
+function roleOptionsHtml(user,current){
+  const maxLvl = user.isDeveloper ? Infinity : levelOf(user.role);
+  return allRolesOrdered().filter(r=> user.isDeveloper ? true : levelOf(r) < maxLvl)
+    .map(r=>`<option value="${r}" ${r===current?"selected":""}>${r}</option>`).join("");
+}
+
+/* ================= API HELPER ================= */
+const API = "/api";
+function getToken(){ return localStorage.getItem("nrhh_token"); }
+function setToken(t){ localStorage.setItem("nrhh_token", t); }
+function clearToken(){ localStorage.removeItem("nrhh_token"); }
+async function api(path, opts={}) {
+  const headers = { "Content-Type":"application/json", ...(opts.headers||{}) };
+  const token = getToken();
+  if (token) headers.Authorization = "Bearer " + token;
+  const res = await fetch(API+path, { ...opts, headers });
+  let data = {};
+  try { data = await res.json(); } catch {}
+  if (res.status === 401) { clearToken(); currentUserCache=null; location.hash=""; route(); throw new Error(data.error||"Nicht angemeldet"); }
+  if (!res.ok) throw new Error(data.error || "Fehler bei der Anfrage");
+  return data;
+}
+
+/* ================= STATE ================= */
+let currentUserCache = null;
+const state = { page:{}, PS:8, filters:{} };
+function P(key){ return state.page[key]||1; }
+function setP(key,v){ state.page[key]=v; }
+
+/* ================= TOAST / MODAL ================= */
+function toast(msg,type="success"){
+  const c = document.getElementById("toastContainer");
+  const t = document.createElement("div");
+  t.className = `toast ${type}`;
+  t.innerHTML = `${type==="success"?"✅":type==="error"?"⚠️":"ℹ️"} ${msg}`;
+  c.appendChild(t);
+  setTimeout(()=>{ t.style.opacity="0"; t.style.transition=".3s"; setTimeout(()=>t.remove(),300); },2800);
+}
+function openModal(html){ const o=document.getElementById("modalOverlay"); o.innerHTML=`<div class="glass modal-box">${html}</div>`; o.classList.add("active"); }
+function closeModal(){ document.getElementById("modalOverlay").classList.remove("active"); }
+function confirmAction(message,fn){
+  openModal(`<h3>⚠️ Bestätigung erforderlich</h3><p style="color:var(--dim);font-size:13px;">${message}</p>
+  <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Abbrechen</button>
+  <button class="btn btn-red" onclick="(${fn.toString()})(); closeModal();">Ja, ausführen</button></div>`);
+}
+
+/* ================= AUTH ================= */
+async function handleLogin(e){
+  e.preventDefault();
+  const username = document.getElementById("loginUser").value;
+  const password = document.getElementById("loginPass").value;
+  const box = document.getElementById("loginErrorBox");
+  try{
+    const data = await api("/auth/login",{method:"POST",body:JSON.stringify({username,password})});
+    setToken(data.token); currentUserCache = data.user;
+    box.innerHTML="";
+    location.hash="dashboard";
+    route();
+  }catch(err){ box.innerHTML = `<div class="login-error">❌ ${err.message}</div>`; }
+  return false;
+}
+async function logout(){
+  try{ await api("/auth/logout",{method:"POST"}); }catch{}
+  clearToken(); currentUserCache=null; location.hash=""; route();
+}
+async function loadMe(){
+  if(!getToken()) return null;
+  if(currentUserCache) return currentUserCache;
+  try{ const d = await api("/auth/me"); currentUserCache=d.user; return d.user; }
+  catch{ return null; }
+}
+
+/* ================= SIDEBAR / ROUTER ================= */
+const MENU = [
+  {page:"dashboard",icon:"🏠",label:"Dashboard",min:0},
+  {page:"shift",icon:"🕐",label:"Schicht",min:0},
+  {page:"warns",icon:"⚠️",label:"Warns",min:2},
+  {page:"bans",icon:"🔨",label:"Bans",min:2},
+  {page:"blacklist",icon:"🚫",label:"Blacklist",min:2},
+  {page:"archive",icon:"🗄️",label:"Archiv",min:2},
+  {page:"leaderboard",icon:"🏆",label:"Leaderboard",min:0},
+  {page:"statistik",icon:"📊",label:"Statistik",min:3},
+  {page:"shift-admin",icon:"📋",label:"Schicht-Verwaltung",min:3},
+  {page:"team",icon:"👥",label:"Team-Übersicht",min:0},
+  {page:"rights",icon:"🛡️",label:"Ingame-Rechte",min:5},
+  {page:"users",icon:"👤",label:"Benutzerverwaltung",min:5},
+  {page:"security",icon:"🔒",label:"Sicherheit",min:5},
+  {page:"logs",icon:"📜",label:"Logs",min:5},
+  {page:"system-status",icon:"📡",label:"System-Status",min:0},
+  {page:"announcements",icon:"📢",label:"Ankündigungen",min:0},
+  {page:"notifications",icon:"🔔",label:"Benachrichtigungen",min:0},
+  {page:"absences",icon:"🌴",label:"Abwesenheiten",min:0},
+  {page:"documents",icon:"📄",label:"Dokumente",min:0},
+  {page:"handbook",icon:"📖",label:"Handbuch",min:0},
+  {page:"rules",icon:"📋",label:"Verhaltensregeln",min:0},
+  {page:"rank-info",icon:"📶",label:"Rang-Info",min:0},
+  {page:"changelog",icon:"🔀",label:"Changelog",min:0},
+  {page:"change-password",icon:"🔑",label:"Passwort ändern",min:0},
+  {page:"profile",icon:"👤",label:"Mein Profil",min:0},
+  {page:"ip-logger",icon:"🌐",label:"IP-Logger",min:0,devOnly:true},
+  {page:"settings",icon:"⚙️",label:"Einstellungen",min:5},
+];
+function canView(item,user){
+  if(!user) return false;
+  if(item.devOnly) return !!user.isDeveloper;
+  if(user.isDeveloper) return true;
+  return levelOf(user.role) >= item.min;
+}
+async function buildSidebar(){
+  const user = await loadMe();
+  const nav = document.getElementById("navMenu");
+  const hash = (location.hash.replace("#","")||"dashboard").split("/")[0];
+  nav.innerHTML = MENU.filter(m=>canView(m,user)).map(m=>`
+    <div class="nav-item ${hash===m.page?"active":""}" onclick="location.hash='${m.page}'; document.getElementById('sidebar').classList.remove('open')">
+      <span class="nav-icon">${m.icon}</span> ${m.label}
+    </div>`).join("") + `<div class="nav-item" onclick="logout()"><span class="nav-icon">🚪</span> Logout</div>`;
+}
+async function renderTopbar(){
+  const u = await loadMe(); if(!u) return;
+  document.getElementById("topAvatar").textContent = (u.username||"?").slice(0,2).toUpperCase();
+  document.getElementById("topName").innerHTML = u.username + (u.isDeveloper?`<span class="dev-badge">DEV</span>`:"");
+  document.getElementById("topRole").textContent = u.role;
+}
+function globalSearchGo(){ location.hash="team"; }
+function showLogin(){ document.getElementById("loginPage").classList.remove("hidden"); document.getElementById("app").classList.add("hidden"); }
+function showApp(){ document.getElementById("loginPage").classList.add("hidden"); document.getElementById("app").classList.remove("hidden"); }
+
+async function route(){
+  const u = await loadMe();
+  if(!u){ showLogin(); return; }
+  showApp();
+  const raw = (location.hash.replace("#","")||"dashboard");
+  const [page,param] = raw.split("/");
+  const menuItem = MENU.find(m=>m.page===page);
+  if(menuItem && !canView(menuItem,u)){ toast("Kein Zugriff auf diesen Bereich.","error"); location.hash="dashboard"; return; }
+  await buildSidebar(); await renderTopbar();
+  const map = {
+    dashboard:renderDashboard, shift:renderShift, warns:renderWarns, bans:renderBans,
+    blacklist:renderBlacklist, archive:renderArchive, leaderboard:renderLeaderboard,
+    statistik:renderStatistik, "shift-admin":renderShiftAdmin, team:renderTeam,
+    rights:renderRights, users:renderUsers, security:renderSecurity, logs:renderLogs,
+    "system-status":renderSystemStatus, announcements:()=>renderContent("announcement","📢 Ankündigungen","Wichtige Neuigkeiten für das gesamte Team."),
+    notifications:renderNotifications, absences:renderAbsences,
+    documents:()=>renderContent("document","📄 Dokumente","Wichtige Dokumente und Leitfäden."),
+    handbook:()=>renderContent("handbook","📖 Handbuch","Einstieg und Ablauf im Team."),
+    rules:()=>renderContent("rules","📋 Verhaltensregeln","Regeln für das gesamte Team."),
+    "rank-info":renderRankInfo,
+    changelog:()=>renderContent("changelog","🔀 Changelog","Alle Updates am System."),
+    "change-password":renderChangePassword, profile:renderProfile,
+    "ip-logger":renderIpLogger, settings:renderSettings, player:()=>renderPlayerProfile(param),
+  };
+  try{ await (map[page]||renderDashboard)(); }
+  catch(err){ document.getElementById("content").innerHTML = `<div class="glass" style="padding:40px;text-align:center;color:var(--dim);">⚠️ ${err.message}</div>`; }
+}
+window.addEventListener("hashchange",route);
+
+/* ================= TABLE HELPERS ================= */
+function tableHtml(headers,rows){
+  return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead>
+  <tbody>${rows.length?rows.join(""):`<tr><td colspan="${headers.length}" class="empty">📭 Keine Daten vorhanden</td></tr>`}</tbody></table></div>`;
+}
+function paginationHtml(total,page,ps,fnName){
+  const pages = Math.max(1,Math.ceil(total/ps));
+  let html = `<div class="pagination">`;
+  for(let i=1;i<=pages;i++) html += `<button class="${page===i?"active":""}" onclick="${fnName}(${i})">${i}</button>`;
+  return html+"</div>";
+}
+function paginate(arr,page,ps){ return arr.slice((page-1)*ps,(page-1)*ps+ps); }
+
+/* ================= DASHBOARD ================= */
+async function renderDashboard(){
+  const u = await loadMe();
+  const stats = await api("/dashboard-stats");
+  const groups = [
+    {label:"MODERATION", min:2, tiles:[
+      {icon:"⚠️",title:"Warns",sub:"Verwarnungen verwalten",page:"warns",min:2},
+      {icon:"🔨",title:"Bans",sub:"Sperrungen verwalten",page:"bans",min:2},
+      {icon:"🚫",title:"Blacklist",sub:"Bewerbungssperren",page:"blacklist",min:2},
+      {icon:"🗄️",title:"Archiv",sub:"Warns & Bans Archiv",page:"archive",min:2},
+    ]},
+    {label:"SCHICHT & TEAM", min:0, tiles:[
+      {icon:"🕐",title:"Schicht",sub:"Eigene Schicht tracken",page:"shift",min:0},
+      {icon:"📋",title:"Schicht-Verwaltung",sub:"Alle Schichten",page:"shift-admin",min:3},
+      {icon:"🏆",title:"Leaderboard",sub:"Ranking",page:"leaderboard",min:0},
+      {icon:"👥",title:"Team-Übersicht",sub:"Alle Mitglieder",page:"team",min:0},
+      {icon:"👤",title:"Mein Profil",sub:"Deine Daten",page:"profile",min:0},
+    ]},
+    {label:"VERWALTUNG", min:5, tiles:[
+      {icon:"👤",title:"Benutzerverwaltung",sub:"Team-Konten",page:"users",min:5},
+      {icon:"🛡️",title:"Ingame-Rechte",sub:"Rollen im Spiel",page:"rights",min:5},
+      {icon:"🔒",title:"Sicherheit",sub:"Audit-Logs",page:"security",min:5},
+      {icon:"📜",title:"Logs",sub:"Aktivitätsprotokoll",page:"logs",min:5},
+      {icon:"📡",title:"System-Status",sub:"Dienste prüfen",page:"system-status",min:0},
+    ]},
+  ];
+  function tilesFor(g){ return g.tiles.filter(t=> u.isDeveloper || levelOf(u.role)>=t.min).map(t=>`
+    <div class="glass tile" onclick="location.hash='${t.page}'">
+      <div class="tile-icon">${t.icon}</div><div><h4>${t.title}</h4><p>${t.sub}</p></div>
+    </div>`).join(""); }
+  const visibleGroups = groups.filter(g=> u.isDeveloper || levelOf(u.role)>=g.min);
+
+  document.getElementById("content").innerHTML = `
+  <div class="hero">
+    <div>
+      <h2>Willkommen zurück, ${u.username} 👋</h2>
+      <p>Notruf Hamburg Verwaltungssystem – vollständige Übersicht über Team, Moderation und Schichten.</p>
+      <span class="badge-role">${u.isDeveloper?"Entwickler · Vollzugriff":ebeneOf(u.role).name+" · "+u.role}</span>
+    </div>
+  </div>
+  <div class="stats-grid">
+    ${statCard("👥",stats.players,"Registrierte Spieler")}
+    ${statCard("🔨",stats.activeBans,"Aktive Bans")}
+    ${statCard("⚠️",stats.warns,"Warns insgesamt")}
+    ${statCard("🛡️",stats.team,"Teammitglieder")}
+  </div>
+  <div class="grid2">
+    <div class="glass">
+      <div class="card-title">📌 Letzte Aktivitäten</div>
+      ${stats.logs.map(l=>`<div class="activity-item"><div class="activity-dot"></div>
+        <div><div><b>${l.user}</b> (${l.role}) → ${l.action}${l.target&&l.target!=="-"?` bei <b>${l.target}</b>`:""}</div>
+        <div class="meta">${l.date} · ${l.time} Uhr</div></div></div>`).join("")}
+    </div>
+    <div class="glass">
+      <div class="card-title">🏙️ Notruf Hamburg</div>
+      <img src="https://images.unsplash.com/photo-1595867818082-083862f3d630?q=80&w=800&auto=format&fit=crop" style="width:100%;display:block;border-bottom:1px solid var(--card-b)">
+      <div style="padding:14px 18px;font-size:12px;color:var(--dim);line-height:1.6;">Polizei, Feuerwehr &amp; Rettungsdienst im Einsatz für Hamburg – alle Einsätze werden über dieses Panel dokumentiert.</div>
+    </div>
+  </div>
+  ${visibleGroups.map(g=>`<div class="section-label">${g.label}</div><div class="tiles-grid">${tilesFor(g)}</div>`).join("")}
+  `;
+}
+function statCard(icon,num,label){
+  return `<div class="glass stat-card"><div class="stat-icon">${icon}</div><div class="stat-num">${num}</div><div class="stat-label">${label}</div></div>`;
+}
+
+/* ================= SCHICHT-SYSTEM ================= */
+let shiftTimer=null;
+async function renderShift(){
+  const data = await api("/shifts/mine");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🕐 Schicht</h2><p>Bestätige stündlich deine Anwesenheit, sonst wird die Schicht automatisch beendet.</p></div></div>
+  <div class="glass shift-hero" id="shiftBox"></div>
+  <div class="glass" style="padding:20px;margin-top:20px;">
+    <h3 style="margin-bottom:12px;font-size:14px;">📜 Letzte Schichten</h3>
+    ${tableHtml(["Start","Ende","Status","Bestätigungen"], data.history.map(s=>`
+      <tr><td>${new Date(s.startTime).toLocaleString("de-DE")}</td>
+      <td>${s.endTime?new Date(s.endTime).toLocaleString("de-DE"):"—"}</td>
+      <td>${shiftStatusBadge(s.status)}</td><td>${s.confirmCount}</td></tr>`))}
+  </div>`;
+  renderShiftBox(data);
+  if(shiftTimer) clearInterval(shiftTimer);
+  shiftTimer = setInterval(async ()=>{
+    if(!location.hash.includes("shift") || location.hash.includes("shift-admin")){ clearInterval(shiftTimer); return; }
+    try{ const d = await api("/shifts/mine"); renderShiftBox(d); }catch{}
+  },1000);
+}
+function shiftStatusBadge(status){
+  if(status==="active") return `<span class="badge badge-green">Aktiv</span>`;
+  if(status==="ended") return `<span class="badge badge-gray">Beendet</span>`;
+  if(status==="auto_ended") return `<span class="badge badge-red">Automatisch beendet</span>`;
+  return `<span class="badge badge-gray">${status}</span>`;
+}
+function renderShiftBox(data){
+  const box = document.getElementById("shiftBox"); if(!box) return;
+  if(data.active){
+    const s = data.active;
+    const totalMs = 60*60000;
+    const remaining = Math.max(0, new Date(s.nextDeadline).getTime() - Date.now());
+    const pct = Math.max(0, Math.min(100, (1-remaining/totalMs)*100));
+    const mins = Math.floor(remaining/60000), secs = Math.floor((remaining%60000)/1000);
+    box.innerHTML = `
+      <span class="shift-status-badge status-active">🟢 Schicht aktiv seit ${new Date(s.startTime).toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}</span>
+      <div class="shift-ring" style="--pct:${pct}"><div class="ring-inner">
+        <div class="time">${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}</div>
+        <div class="label">bis zur Bestätigung</div></div></div>
+      <p style="color:var(--dim);font-size:12.5px;margin-bottom:18px;">Bestätigungen bisher: <b style="color:#fff;">${s.confirmCount}</b></p>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-green big-confirm-btn" onclick="confirmShift('${s.id}')">✅ Jetzt bestätigen</button>
+        <button class="btn btn-red btn-full" style="max-width:200px;" onclick="confirmAction('Schicht wirklich beenden?', endShiftFn)">⏹️ Schicht beenden</button>
+      </div>`;
+    if(remaining<=0){ setTimeout(()=>renderShift(),1500); }
+  } else if (data.cooldownRemaining > 0){
+    const mins = Math.floor(data.cooldownRemaining/60000), secs=Math.floor((data.cooldownRemaining%60000)/1000);
+    box.innerHTML = `
+      <span class="shift-status-badge status-cooldown">⏳ Cooldown aktiv</span>
+      <div class="shift-ring" style="--pct:${100-(data.cooldownRemaining/(10*60000)*100)}"><div class="ring-inner">
+        <div class="time">${String(mins).padStart(2,"0")}:${String(secs).padStart(2,"0")}</div>
+        <div class="label">bis neue Schicht möglich</div></div></div>
+      <p style="color:var(--dim);font-size:12.5px;">Um Missbrauch zu vermeiden, kannst du nach Schichtende erst nach 10 Minuten eine neue Schicht starten.</p>`;
+  } else {
+    box.innerHTML = `
+      <span class="shift-status-badge status-ended">⚪ Keine aktive Schicht</span>
+      <div style="font-size:48px;margin:14px 0;">🕐</div>
+      <p style="color:var(--dim);font-size:13px;margin-bottom:20px;">Starte deine Schicht, um Aktivität zu tracken. Du musst danach jede Stunde bestätigen – sonst endet die Schicht automatisch.</p>
+      <button class="btn btn-green big-confirm-btn" onclick="startShift()">▶️ Schicht starten</button>`;
+  }
+}
+async function startShift(){ try{ await api("/shifts/start",{method:"POST"}); toast("Schicht gestartet"); renderShift(); }catch(e){ toast(e.message,"error"); } }
+async function confirmShift(id){ try{ await api("/shifts/confirm",{method:"POST",body:JSON.stringify({shiftId:id})}); toast("Bestätigt – weiter geht's!"); renderShift(); }catch(e){ toast(e.message,"error"); renderShift(); } }
+async function endShiftFn(){ try{ await api("/shifts/end",{method:"POST"}); toast("Schicht beendet","info"); renderShift(); }catch(e){ toast(e.message,"error"); } }
+
+async function renderShiftAdmin(){
+  const data = await api("/shifts/all");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>📋 Schicht-Verwaltung</h2><p>Übersicht aller Team-Schichten.</p></div></div>
+  <div class="glass" style="padding:20px;">
+    ${tableHtml(["Benutzer","Rolle","Start","Ende","Status","Bestätigungen"], data.shifts.map(s=>`
+      <tr><td><b>${s.username}</b></td><td><span class="badge ${roleBadgeClass(s.role)}">${s.role}</span></td>
+      <td>${new Date(s.startTime).toLocaleString("de-DE")}</td>
+      <td>${s.endTime?new Date(s.endTime).toLocaleString("de-DE"):"—"}</td>
+      <td>${shiftStatusBadge(s.status)}</td><td>${s.confirmCount}</td></tr>`))}
+  </div>`;
+}
+
+/* ================= TEAM ÜBERSICHT ================= */
+async function renderTeam(){
+  const data = await api("/team");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>👥 Team-Übersicht</h2><p>Alle aktiven Teammitglieder nach Ebene sortiert.</p></div></div>
+  <div class="glass" style="padding:20px;">
+    ${tableHtml(["Benutzer","Discord","Rolle","Ebene"], data.team.map(u=>`
+      <tr><td><b>${u.username}</b>${u.isDeveloper?'<span class="dev-badge">DEV</span>':""}</td><td>${u.discord}</td>
+      <td><span class="badge ${roleBadgeClass(u.role)}">${u.role}</span></td><td>${u.ebene}</td></tr>`))}
+  </div>`;
+}
+
+/* ================= WARNS ================= */
+async function renderWarns(){
+  const f = state.filters.warns || {q:"",date:""};
+  const data = await api(`/warns?q=${encodeURIComponent(f.q)}&date=${f.date}`);
+  const list = data.warns;
+  const rows = paginate(list,P("warns"),state.PS).map(w=>`
+    <tr><td><b>${w.player}</b></td><td>${w.reason}</td><td>${w.date}</td><td>${w.time}</td><td>${w.moderator}</td><td>${w.note||"-"}</td>
+    <td><button class="btn btn-ghost btn-sm" onclick="openEditWarn('${w.id}')">✏️</button>
+    <button class="btn btn-red btn-sm" onclick="confirmAction('Warn von ${w.player} löschen?', ()=>deleteWarn('${w.id}'))">🗑️</button></td></tr>`);
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>⚠️ Warn-System</h2><p>Verwarnungen erstellen, bearbeiten und einsehen.</p></div></div>
+  <div class="glass" style="padding:20px;margin-bottom:18px;">
+    <h3 style="margin-bottom:12px;font-size:13.5px;">➕ Neue Verwarnung erstellen</h3>
+    <form onsubmit="return submitWarn(event)">
+      <div class="row2">
+        <div class="form-group"><label>@ Roblox-Spielername</label><input class="input" id="wPlayer" required></div>
+        <div class="form-group"><label>Grund</label><input class="input" id="wReason" required></div>
+      </div>
+      <div class="row2">
+        <div class="form-group"><label>Datum</label><input class="input" type="date" id="wDate" value="${new Date().toISOString().slice(0,10)}" required></div>
+        <div class="form-group"><label>Uhrzeit</label><input class="input" type="time" id="wTime" value="${new Date().toTimeString().slice(0,5)}" required></div>
+      </div>
+      <div class="form-group"><label>Notiz (optional)</label><textarea class="input" id="wNote"></textarea></div>
+      <button class="btn btn-green" type="submit">Verwarnung speichern</button>
+    </form>
+  </div>
+  <div class="glass" style="padding:20px;">
+    <div class="toolbar">
+      <input class="input" placeholder="🔍 Spieler suchen..." value="${f.q}" oninput="state.filters.warns={...(state.filters.warns||{}),q:this.value}; setP('warns',1); renderWarns()">
+      <input class="input" type="date" value="${f.date}" onchange="state.filters.warns={...(state.filters.warns||{}),date:this.value}; setP('warns',1); renderWarns()">
+    </div>
+    ${tableHtml(["Spieler","Grund","Datum","Uhrzeit","Bearbeiter","Notiz","Aktionen"],rows)}
+    ${paginationHtml(list.length,P("warns"),state.PS,"gotoPage_warns")}
+  </div>`;
+}
+function gotoPage_warns(p){ setP("warns",p); renderWarns(); }
+async function submitWarn(e){
+  e.preventDefault();
+  try{
+    await api("/warns",{method:"POST",body:JSON.stringify({
+      player:document.getElementById("wPlayer").value, reason:document.getElementById("wReason").value,
+      date:document.getElementById("wDate").value, time:document.getElementById("wTime").value, note:document.getElementById("wNote").value
+    })});
+    toast("Verwarnung erstellt"); renderWarns();
+  }catch(err){ toast(err.message,"error"); }
+  return false;
+}
+async function deleteWarn(id){ try{ await api("/warns/"+id,{method:"DELETE"}); toast("Warn gelöscht","info"); renderWarns(); }catch(e){ toast(e.message,"error"); } }
+async function openEditWarn(id){
+  const data = await api(`/warns?q=`); const w = data.warns.find(x=>x.id===id);
+  openModal(`<h3>✏️ Warn bearbeiten</h3>
+  <div class="form-group"><label>Grund</label><input class="input" id="ewReason" value="${w.reason}"></div>
+  <div class="row2"><div class="form-group"><label>Datum</label><input class="input" type="date" id="ewDate" value="${w.date}"></div>
+  <div class="form-group"><label>Uhrzeit</label><input class="input" type="time" id="ewTime" value="${w.time}"></div></div>
+  <div class="form-group"><label>Notiz</label><textarea class="input" id="ewNote">${w.note||""}</textarea></div>
+  <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Abbrechen</button>
+  <button class="btn btn-green" onclick="saveEditWarn('${id}')">Speichern</button></div>`);
+}
+async function saveEditWarn(id){
+  try{
+    await api("/warns/"+id,{method:"PUT",body:JSON.stringify({
+      reason:document.getElementById("ewReason").value, date:document.getElementById("ewDate").value,
+      time:document.getElementById("ewTime").value, note:document.getElementById("ewNote").value })});
+    closeModal(); toast("Warn aktualisiert"); renderWarns();
+  }catch(e){ toast(e.message,"error"); }
+}
+
+/* ================= BANS ================= */
+async function renderBans(){
+  const f = state.filters.bans || {q:""};
+  const data = await api(`/bans?q=${encodeURIComponent(f.q)}`);
+  const rows = paginate(data.bans,P("bans"),state.PS).map(b=>`
+    <tr><td><b>${b.player}</b></td><td>${b.reason}</td><td>${b.startDate} ${b.startTime}</td>
+    <td>${b.type==="permanent"?"Permanent":b.duration+" "+b.durationUnit}</td>
+    <td>${b.endDateTime?new Date(b.endDateTime).toLocaleString("de-DE"):"—"}</td>
+    <td>${banBadge(b.status)}</td><td>${b.moderator}</td>
+    <td><button class="btn btn-red btn-sm" onclick="confirmAction('Ban von ${b.player} aufheben?', ()=>deleteBan('${b.id}'))">🗑️</button></td></tr>`);
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🔨 Ban-System</h2><p>Temporäre und permanente Sperren verwalten.</p></div></div>
+  <div class="glass" style="padding:20px;margin-bottom:18px;">
+    <h3 style="margin-bottom:12px;font-size:13.5px;">➕ Neuen Ban erstellen</h3>
+    <form onsubmit="return submitBan(event)">
+      <div class="row2">
+        <div class="form-group"><label>@ Roblox-Spielername</label><input class="input" id="bPlayer" required></div>
+        <div class="form-group"><label>Ban-Grund</label><input class="input" id="bReason" required></div>
+      </div>
+      <div class="row2">
+        <div class="form-group"><label>Startdatum</label><input class="input" type="date" id="bDate" value="${new Date().toISOString().slice(0,10)}" required></div>
+        <div class="form-group"><label>Startuhrzeit</label><input class="input" type="time" id="bTime" value="${new Date().toTimeString().slice(0,5)}" required></div>
+      </div>
+      <div class="form-group"><label>Ban-Typ</label>
+        <select class="select" id="bType" onchange="document.getElementById('bDurationBox').style.display=this.value==='temporary'?'grid':'none'">
+          <option value="temporary">Temporär</option><option value="permanent">Permanent</option></select></div>
+      <div class="row2" id="bDurationBox">
+        <div class="form-group"><label>Dauer</label><input class="input" type="number" min="1" id="bDuration" value="7"></div>
+        <div class="form-group"><label>Einheit</label><select class="select" id="bUnit">
+          <option value="hours">Stunden</option><option value="days" selected>Tage</option><option value="weeks">Wochen</option><option value="months">Monate</option></select></div>
+      </div>
+      <div class="form-group"><label>Zusätzliche Informationen</label><textarea class="input" id="bNote"></textarea></div>
+      <button class="btn btn-green" type="submit">Ban erstellen</button>
+    </form>
+  </div>
+  <div class="glass" style="padding:20px;">
+    <div class="toolbar"><input class="input" placeholder="🔍 Spieler suchen..." value="${f.q}" oninput="state.filters.bans={q:this.value}; setP('bans',1); renderBans()"></div>
+    ${tableHtml(["Spieler","Grund","Start","Dauer","Ende","Status","Bearbeiter","Aktionen"],rows)}
+    ${paginationHtml(data.bans.length,P("bans"),state.PS,"gotoPage_bans")}
+  </div>`;
+}
+function banBadge(status){
+  if(status==="Aktiv") return `<span class="badge badge-red">Aktiv</span>`;
+  if(status==="Permanent") return `<span class="badge badge-purple">Permanent</span>`;
+  return `<span class="badge badge-green">Abgelaufen</span>`;
+}
+function gotoPage_bans(p){ setP("bans",p); renderBans(); }
+async function submitBan(e){
+  e.preventDefault();
+  try{
+    await api("/bans",{method:"POST",body:JSON.stringify({
+      player:document.getElementById("bPlayer").value, reason:document.getElementById("bReason").value,
+      type:document.getElementById("bType").value, startDate:document.getElementById("bDate").value,
+      startTime:document.getElementById("bTime").value, duration:document.getElementById("bDuration").value,
+      durationUnit:document.getElementById("bUnit").value, note:document.getElementById("bNote").value
+    })});
+    toast("Ban erstellt"); renderBans();
+  }catch(err){ toast(err.message,"error"); }
+  return false;
+}
+async function deleteBan(id){ try{ await api("/bans/"+id,{method:"DELETE"}); toast("Ban aufgehoben","info"); renderBans(); }catch(e){ toast(e.message,"error"); } }
+
+/* ================= BLACKLIST ================= */
+async function renderBlacklist(){
+  const data = await api("/blacklist");
+  const rows = data.blacklist.map(b=>`
+    <tr><td><b>${b.name}</b></td><td>${b.discordId}</td><td>${b.reason}</td><td>${b.addedBy}</td><td>${b.date}</td>
+    <td><button class="btn btn-red btn-sm" onclick="confirmAction('Eintrag entfernen?', ()=>deleteBlacklist('${b.id}'))">🗑️</button></td></tr>`);
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🚫 Blacklist</h2><p>Bewerbungssperren für problematische Personen.</p></div></div>
+  <div class="glass" style="padding:20px;margin-bottom:18px;">
+    <form onsubmit="return submitBlacklist(event)">
+      <div class="row2">
+        <div class="form-group"><label>Name</label><input class="input" id="blName" required></div>
+        <div class="form-group"><label>Discord-ID</label><input class="input" id="blDiscordId" required></div>
+      </div>
+      <div class="form-group"><label>Grund</label><textarea class="input" id="blReason" required></textarea></div>
+      <button class="btn btn-green" type="submit">Zur Blacklist hinzufügen</button>
+    </form>
+  </div>
+  <div class="glass" style="padding:20px;">${tableHtml(["Name","Discord-ID","Grund","Hinzugefügt von","Datum","Aktionen"],rows)}</div>`;
+}
+async function submitBlacklist(e){
+  e.preventDefault();
+  try{
+    await api("/blacklist",{method:"POST",body:JSON.stringify({name:document.getElementById("blName").value,discordId:document.getElementById("blDiscordId").value,reason:document.getElementById("blReason").value})});
+    toast("Blacklist-Eintrag erstellt"); renderBlacklist();
+  }catch(err){ toast(err.message,"error"); }
+  return false;
+}
+async function deleteBlacklist(id){ try{ await api("/blacklist/"+id,{method:"DELETE"}); toast("Eintrag entfernt","info"); renderBlacklist(); }catch(e){ toast(e.message,"error"); } }
+
+/* ================= ARCHIV ================= */
+async function renderArchive(){
+  const data = await api("/archive");
+  const rows = data.items.map(i=>`
+    <tr><td><span class="badge ${i.kind==="Warn"?"badge-blue":"badge-red"}">${i.kind}</span></td><td><b>${i.player}</b></td>
+    <td>${i.reason}</td><td>${i.date}</td><td>${i.moderator}</td><td>${i.status?banBadge(i.status):"—"}</td></tr>`);
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🗄️ Archiv</h2><p>Vollständiges Archiv aller Warns &amp; Bans.</p></div></div>
+  <div class="glass" style="padding:20px;">${tableHtml(["Typ","Spieler","Grund","Datum","Bearbeiter","Status"],rows)}</div>`;
+}
+
+/* ================= LEADERBOARD ================= */
+async function renderLeaderboard(){
+  const data = await api("/leaderboard");
+  function top3(arr,key,label){
+    const medals=["🥇","🥈","🥉"];
+    return `<div class="tiles-grid" style="margin-bottom:16px;">${arr.slice(0,3).map((e,i)=>`
+      <div class="glass" style="padding:20px;text-align:center;"><div style="font-size:28px;">${medals[i]}</div>
+      <h4 style="margin-top:6px;">${e.name}</h4><p style="font-size:11px;color:var(--dim);">${e.role}</p>
+      <div style="font-size:22px;font-weight:800;margin-top:8px;color:var(--green);">${e[key]}</div>
+      <p style="font-size:11px;color:var(--dim);">${label}</p></div>`).join("")}</div>`;
+  }
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🏆 Leaderboard</h2><p>Die aktivsten Teammitglieder im Überblick.</p></div></div>
+  <div class="section-label">Moderations-Leaderboard</div>
+  ${top3(data.moderation,"total","Aktionen gesamt")}
+  <div class="glass" style="padding:20px;margin-bottom:20px;">
+    ${tableHtml(["#","Benutzer","Rolle","Warns","Bans","Gesamt"], data.moderation.map((e,i)=>`
+      <tr><td>${i+1}</td><td><b>${e.name}</b></td><td><span class="badge ${roleBadgeClass(e.role)}">${e.role}</span></td>
+      <td>${e.warns}</td><td>${e.bans}</td><td><b>${e.total}</b></td></tr>`))}
+  </div>
+  <div class="section-label">Aktivitäts-Leaderboard</div>
+  ${top3(data.activity,"count","Aktionen protokolliert")}
+  <div class="glass" style="padding:20px;">
+    ${tableHtml(["#","Benutzer","Rolle","Aktionen"], data.activity.map((e,i)=>`
+      <tr><td>${i+1}</td><td><b>${e.name}</b></td><td><span class="badge ${roleBadgeClass(e.role)}">${e.role}</span></td><td>${e.count}</td></tr>`))}
+  </div>`;
+}
+
+/* ================= STATISTIK ================= */
+async function renderStatistik(){
+  const s = await api("/stats");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>📊 Statistik</h2><p>Systemweite Kennzahlen.</p></div></div>
+  <div class="stats-grid">
+    ${statCard("👥",s.players,"Registrierte Spieler")}
+    ${statCard("🔨",s.activeBans,"Aktive Bans")}
+    ${statCard("⚠️",s.warns,"Warns insgesamt")}
+    ${statCard("🛡️",s.team,"Teammitglieder")}
+    ${statCard("🕐",s.activeShifts,"Aktive Schichten")}
+    ${statCard("🚫",s.blacklist,"Blacklist-Einträge")}
+  </div>`;
+}
+
+/* ================= INGAME-RECHTE ================= */
+async function renderRights(){
+  const u = await loadMe();
+  const data = await api("/rights");
+  const rows = data.rights.map(r=>{
+    const editable = canEditRole(u,r.role);
+    return `<tr><td>${r.discordName}</td><td>${r.discordId}</td><td><b>${r.robloxName}</b></td>
+    <td><span class="badge ${roleBadgeClass(r.role)}">${r.role}</span></td><td>${r.assignedBy}</td><td>${r.date}</td>
+    <td>${editable?`<button class="btn btn-ghost btn-sm" onclick="openEditRight('${r.id}')">✏️</button>
+    <button class="btn btn-red btn-sm" onclick="confirmAction('Recht entfernen?', ()=>deleteRight('${r.id}'))">🗑️</button>`:`<span style="color:var(--dim);font-size:11px;">Kein Zugriff</span>`}</td></tr>`;
+  });
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🛡️ Ingame-Rechte</h2><p>Ingame-Rollen für Spieler &amp; Team vergeben.</p></div></div>
+  <div class="glass" style="padding:20px;margin-bottom:18px;">
+    <form onsubmit="return submitRight(event)">
+      <div class="row2">
+        <div class="form-group"><label>Discord-Name (mit @)</label><input class="input" id="rDiscord" required></div>
+        <div class="form-group"><label>Discord-ID</label><input class="input" id="rDiscordId" required></div>
+      </div>
+      <div class="row2">
+        <div class="form-group"><label>Roblox-Name</label><input class="input" id="rRoblox" required></div>
+        <div class="form-group"><label>Rolle</label><select class="select" id="rRole">${roleOptionsHtml(u,null)}</select></div>
+      </div>
+      <button class="btn btn-green" type="submit">Recht vergeben</button>
+    </form>
+  </div>
+  <div class="glass" style="padding:20px;">${tableHtml(["Discord-Name","Discord-ID","Roblox-Name","Rolle","Vergeben von","Datum","Aktionen"],rows)}</div>`;
+}
+async function submitRight(e){
+  e.preventDefault();
+  try{
+    await api("/rights",{method:"POST",body:JSON.stringify({
+      discordName:document.getElementById("rDiscord").value, discordId:document.getElementById("rDiscordId").value,
+      robloxName:document.getElementById("rRoblox").value, role:document.getElementById("rRole").value })});
+    toast("Ingame-Recht vergeben"); renderRights();
+  }catch(err){ toast(err.message,"error"); }
+  return false;
+}
+async function openEditRight(id){
+  const u = await loadMe();
+  const data = await api("/rights"); const r = data.rights.find(x=>x.id===id);
+  openModal(`<h3>✏️ Ingame-Recht bearbeiten</h3>
+  <div class="form-group"><label>Roblox-Name</label><input class="input" id="erRoblox" value="${r.robloxName}"></div>
+  <div class="form-group"><label>Rolle</label><select class="select" id="erRole">${roleOptionsHtml(u,r.role)}</select></div>
+  <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Abbrechen</button>
+  <button class="btn btn-green" onclick="saveEditRight('${id}')">Speichern</button></div>`);
+}
+async function saveEditRight(id){
+  try{
+    await api("/rights/"+id,{method:"PUT",body:JSON.stringify({robloxName:document.getElementById("erRoblox").value, role:document.getElementById("erRole").value})});
+    closeModal(); toast("Aktualisiert"); renderRights();
+  }catch(e){ toast(e.message,"error"); }
+}
+async function deleteRight(id){ try{ await api("/rights/"+id,{method:"DELETE"}); toast("Entfernt","info"); renderRights(); }catch(e){ toast(e.message,"error"); } }
+
+/* ================= BENUTZERVERWALTUNG ================= */
+async function renderUsers(){
+  const u = await loadMe();
+  const data = await api("/users");
+  const rows = data.users.map(x=>{
+    const editable = x.id!==u.id && canEditRole(u,x.role);
+    return `<tr><td><b>${x.username}</b>${x.isDeveloper?'<span class="dev-badge">DEV</span>':""}</td><td>${x.discord}</td><td>${x.discordId}</td>
+    <td><span class="badge ${roleBadgeClass(x.role)}">${x.role}</span></td>
+    <td>${x.active?`<span class="badge badge-green">Aktiv</span>`:`<span class="badge badge-gray">Deaktiviert</span>`}</td>
+    <td>${editable?`<button class="btn btn-ghost btn-sm" onclick="openEditUser('${x.id}')">✏️</button>
+    <button class="btn btn-ghost btn-sm" onclick="toggleUser('${x.id}')">${x.active?"⛔":"✅"}</button>
+    <button class="btn btn-red btn-sm" onclick="confirmAction('Benutzer löschen?', ()=>deleteUser('${x.id}'))">🗑️</button>`:`<span style="color:var(--dim);font-size:11px;">${x.id===u.id?"Das bist du":"Kein Zugriff"}</span>`}</td></tr>`;
+  });
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>👤 Benutzerverwaltung</h2><p>Website-Zugänge für das Team verwalten.</p></div>
+  <button class="btn btn-green" onclick="openCreateUser()">+ Neuen Benutzer erstellen</button></div>
+  <div class="glass" style="padding:20px;">${tableHtml(["Benutzername","Discord","Discord-ID","Rolle","Status","Aktionen"],rows)}</div>`;
+}
+async function openCreateUser(){
+  const u = await loadMe();
+  openModal(`<h3>➕ Neuen Benutzer erstellen</h3>
+  <div class="form-group"><label>Benutzername</label><input class="input" id="nuUser" required></div>
+  <div class="form-group"><label>Passwort</label><input class="input" type="password" id="nuPass" required></div>
+  <div class="form-group"><label>Discord-Name</label><input class="input" id="nuDiscord"></div>
+  <div class="form-group"><label>Discord-ID</label><input class="input" id="nuDiscordId"></div>
+  <div class="form-group"><label>Rolle</label><select class="select" id="nuRole">${roleOptionsHtml(u,null)}</select></div>
+  <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Abbrechen</button>
+  <button class="btn btn-green" onclick="submitCreateUser()">Erstellen</button></div>`);
+}
+async function submitCreateUser(){
+  try{
+    await api("/users",{method:"POST",body:JSON.stringify({
+      username:document.getElementById("nuUser").value, password:document.getElementById("nuPass").value,
+      discord:document.getElementById("nuDiscord").value, discordId:document.getElementById("nuDiscordId").value,
+      role:document.getElementById("nuRole").value })});
+    closeModal(); toast("Benutzer erstellt"); renderUsers();
+  }catch(e){ toast(e.message,"error"); }
+}
+async function openEditUser(id){
+  const u = await loadMe();
+  const data = await api("/users"); const x = data.users.find(y=>y.id===id);
+  openModal(`<h3>✏️ Benutzer bearbeiten</h3>
+  <div class="form-group"><label>Benutzername</label><input class="input" id="euUser" value="${x.username}"></div>
+  <div class="form-group"><label>Neues Passwort (optional)</label><input class="input" type="password" id="euPass"></div>
+  <div class="form-group"><label>Rolle</label><select class="select" id="euRole">${roleOptionsHtml(u,x.role)}</select></div>
+  <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Abbrechen</button>
+  <button class="btn btn-green" onclick="saveEditUser('${id}')">Speichern</button></div>`);
+}
+async function saveEditUser(id){
+  try{
+    const body = { username:document.getElementById("euUser").value, role:document.getElementById("euRole").value };
+    const pass = document.getElementById("euPass").value; if(pass) body.password=pass;
+    await api("/users/"+id,{method:"PUT",body:JSON.stringify(body)});
+    closeModal(); toast("Benutzer aktualisiert"); renderUsers();
+  }catch(e){ toast(e.message,"error"); }
+}
+async function toggleUser(id){ try{ await api("/users/"+id+"/toggle",{method:"POST"}); toast("Status geändert","info"); renderUsers(); }catch(e){ toast(e.message,"error"); } }
+async function deleteUser(id){ try{ await api("/users/"+id,{method:"DELETE"}); toast("Gelöscht","info"); renderUsers(); }catch(e){ toast(e.message,"error"); } }
+
+/* ================= SICHERHEIT ================= */
+async function renderSecurity(){
+  const data = await api("/security/sessions");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🔒 Sicherheit</h2><p>Login-Sitzungen und Sicherheitsprotokoll.</p></div></div>
+  <div class="glass" style="padding:20px;">
+    ${tableHtml(["Benutzer","IP-Adresse","Gerät","Zeitpunkt"], data.sessions.map(s=>`
+      <tr><td><b>${s.username}</b></td><td>${s.ip}</td><td style="max-width:280px;white-space:normal;font-size:11px;color:var(--dim);">${s.device}</td><td>${s.date}</td></tr>`))}
+  </div>`;
+}
+
+/* ================= LOGS ================= */
+async function renderLogs(){
+  const data = await api("/logs");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>📜 Logs</h2><p>Vollständiges, unveränderliches Aktivitätsprotokoll.</p></div></div>
+  <div class="glass" style="padding:20px;">
+    ${tableHtml(["Benutzer","Rolle","Aktion","Ziel","Datum","Uhrzeit"], data.logs.map(l=>`
+      <tr><td><b>${l.user}</b></td><td><span class="badge ${roleBadgeClass(l.role)}">${l.role}</span></td>
+      <td>${l.action}</td><td>${l.target&&l.target!=="-"?l.target:"—"}</td><td>${l.date}</td><td>${l.time}</td></tr>`))}
+  </div>`;
+}
+
+/* ================= SYSTEM STATUS ================= */
+async function renderSystemStatus(){
+  const data = await api("/system-status");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>📡 System-Status</h2><p>Aktueller Status aller Dienste.</p></div></div>
+  <div class="tiles-grid">
+    ${data.status.map(s=>`<div class="glass tile"><div class="tile-icon">${s.status==="online"?"🟢":"🔴"}</div>
+    <div><h4>${s.name}</h4><p>${s.status==="online"?"Online":"Offline"}</p></div></div>`).join("")}
+  </div>`;
+}
+
+/* ================= CONTENT (Ankündigungen/Doku/Handbuch/Regeln/Changelog) ================= */
+async function renderContent(type,title,sub){
+  const u = await loadMe();
+  const data = await api("/content/"+type);
+  const canAdd = u.isDeveloper || levelOf(u.role)>=4;
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>${title}</h2><p>${sub}</p></div>
+  ${canAdd?`<button class="btn btn-green" onclick="openAddContent('${type}')">+ Neuer Eintrag</button>`:""}</div>
+  <div style="display:flex;flex-direction:column;gap:14px;">
+    ${data.items.length? data.items.map(i=>`
+      <div class="glass" style="padding:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="font-size:15px;">${i.pinned?"📌 ":""}${i.title}</h3>
+          ${canAdd?`<button class="btn btn-red btn-sm" onclick="confirmAction('Eintrag löschen?', ()=>deleteContent('${type}','${i.id}'))">🗑️</button>`:""}
+        </div>
+        <p style="font-size:12px;color:var(--dim);margin:6px 0 12px;">von ${i.author} · ${i.date}</p>
+        <p style="font-size:13.5px;white-space:pre-line;line-height:1.6;">${i.body}</p>
+      </div>`).join("") : `<div class="glass" style="padding:40px;text-align:center;color:var(--dim);">📭 Keine Einträge vorhanden</div>`}
+  </div>`;
+}
+function openAddContent(type){
+  openModal(`<h3>➕ Neuer Eintrag</h3>
+  <div class="form-group"><label>Titel</label><input class="input" id="cTitle" required></div>
+  <div class="form-group"><label>Inhalt</label><textarea class="input" id="cBody" style="min-height:120px;"></textarea></div>
+  <label style="display:flex;gap:8px;align-items:center;font-size:12.5px;margin-bottom:10px;"><input type="checkbox" id="cPinned"> Anheften</label>
+  <div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">Abbrechen</button>
+  <button class="btn btn-green" onclick="submitContent('${type}')">Speichern</button></div>`);
+}
+async function submitContent(type){
+  try{
+    await api("/content/"+type,{method:"POST",body:JSON.stringify({title:document.getElementById("cTitle").value,body:document.getElementById("cBody").value,pinned:document.getElementById("cPinned").checked})});
+    closeModal(); toast("Eintrag erstellt"); renderContent(type,"","");
+    route();
+  }catch(e){ toast(e.message,"error"); }
+}
+async function deleteContent(type,id){ try{ await api(`/content/${type}/${id}`,{method:"DELETE"}); toast("Gelöscht","info"); route(); }catch(e){ toast(e.message,"error"); } }
+
+/* ================= BENACHRICHTIGUNGEN ================= */
+async function renderNotifications(){
+  const data = await api("/notifications/mine");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🔔 Benachrichtigungen</h2><p>Deine persönlichen Systembenachrichtigungen.</p></div>
+  <button class="btn btn-ghost" onclick="markAllRead()">Alle als gelesen markieren</button></div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+    ${data.notifications.length? data.notifications.map(n=>`
+      <div class="glass" style="padding:16px 18px;${n.read?"opacity:.6;":""}"><p style="font-size:13.5px;">${n.message}</p>
+      <p style="font-size:11px;color:var(--dim);margin-top:6px;">${n.date}</p></div>`).join("") :
+      `<div class="glass" style="padding:40px;text-align:center;color:var(--dim);">📭 Keine Benachrichtigungen</div>`}
+  </div>`;
+}
+async function markAllRead(){ try{ await api("/notifications/read-all",{method:"POST"}); toast("Alle gelesen"); renderNotifications(); }catch(e){} }
+
+/* ================= ABWESENHEITEN ================= */
+async function renderAbsences(){
+  const u = await loadMe();
+  const data = await api("/absences");
+  const canManage = u.isDeveloper || levelOf(u.role)>=3;
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🌴 Abwesenheiten</h2><p>${canManage?"Alle gemeldeten Abwesenheiten verwalten.":"Melde deine Abwesenheit an."}</p></div></div>
+  <div class="glass" style="padding:20px;margin-bottom:18px;">
+    <form onsubmit="return submitAbsence(event)">
+      <div class="row2">
+        <div class="form-group"><label>Von</label><input class="input" type="date" id="abFrom" required></div>
+        <div class="form-group"><label>Bis</label><input class="input" type="date" id="abTo" required></div>
+      </div>
+      <div class="form-group"><label>Grund</label><textarea class="input" id="abReason" required></textarea></div>
+      <button class="btn btn-green" type="submit">Abwesenheit melden</button>
+    </form>
+  </div>
+  <div class="glass" style="padding:20px;">
+    ${tableHtml(["Benutzer","Von","Bis","Grund","Status",canManage?"Aktionen":""], data.absences.map(a=>`
+      <tr><td><b>${a.username}</b></td><td>${a.from}</td><td>${a.to}</td><td>${a.reason}</td>
+      <td>${a.status==="approved"?'<span class="badge badge-green">Genehmigt</span>':a.status==="rejected"?'<span class="badge badge-red">Abgelehnt</span>':'<span class="badge badge-gray">Ausstehend</span>'}</td>
+      <td>${canManage&&a.status==="pending"?`<button class="btn btn-green btn-sm" onclick="setAbsence('${a.id}','approved')">✅</button>
+      <button class="btn btn-red btn-sm" onclick="setAbsence('${a.id}','rejected')">❌</button>`:""}</td></tr>`))}
+  </div>`;
+}
+async function submitAbsence(e){
+  e.preventDefault();
+  try{
+    await api("/absences",{method:"POST",body:JSON.stringify({from:document.getElementById("abFrom").value,to:document.getElementById("abTo").value,reason:document.getElementById("abReason").value})});
+    toast("Abwesenheit gemeldet"); renderAbsences();
+  }catch(e){ toast(e.message,"error"); }
+  return false;
+}
+async function setAbsence(id,status){ try{ await api("/absences/"+id,{method:"PUT",body:JSON.stringify({status})}); toast("Aktualisiert"); renderAbsences(); }catch(e){ toast(e.message,"error"); } }
+
+/* ================= RANG-INFO ================= */
+async function renderRankInfo(){
+  const html = [...EBENEN].reverse().map(e=>`
+    <div class="glass rank-ebene-card">
+      <div class="ebene-head"><h4>${e.icon} ${e.name}</h4><span class="badge badge-green">Level ${e.level}</span></div>
+      <div class="rank-role-list">${e.roles.map(r=>`<span class="rank-role-chip">${r}</span>`).join("")}</div>
+    </div>`).join("");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>📶 Rang-Info</h2><p>Alle Ebenen haben innerhalb ihrer Stufe exakt identische Berechtigungen.</p></div></div>
+  ${html}
+  <div class="glass" style="padding:18px;margin-top:6px;font-size:12.5px;color:var(--dim);line-height:1.7;">
+    <b style="color:#fff;">Zugriffsregeln:</b><br>
+    • Ab <b>Moderator</b>-Ebene: Zugriff auf Warns, Bans, Blacklist, Archiv<br>
+    • Ab <b>Low Team Ebene – Administrator</b>: zusätzlich Statistik &amp; Schicht-Verwaltung<br>
+    • Ab <b>High Rank</b>: Vollzugriff (Benutzerverwaltung, Ingame-Rechte, Sicherheit, Logs, Einstellungen)<br>
+    • <b>Entwickler</b> (Chris) hat systemweiten Vollzugriff inkl. IP-Logger
+  </div>`;
+}
+
+/* ================= CHANGELOG - reuse content ================= */
+
+/* ================= PASSWORT ÄNDERN ================= */
+async function renderChangePassword(){
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🔑 Passwort ändern</h2><p>Aktualisiere dein Zugangspasswort.</p></div></div>
+  <div class="glass" style="padding:24px;max-width:440px;">
+    <form onsubmit="return submitChangePassword(event)">
+      <div class="form-group"><label>Aktuelles Passwort</label><input class="input" type="password" id="curPass" required></div>
+      <div class="form-group"><label>Neues Passwort</label><input class="input" type="password" id="newPass" required></div>
+      <button class="btn btn-green" type="submit">Passwort ändern</button>
+    </form>
+  </div>`;
+}
+async function submitChangePassword(e){
+  e.preventDefault();
+  try{
+    const data = await api("/auth/change-password",{method:"PUT",body:JSON.stringify({oldPassword:document.getElementById("curPass").value,newPassword:document.getElementById("newPass").value})});
+    setToken(data.token); toast("Passwort geändert"); e.target.reset();
+  }catch(err){ toast(err.message,"error"); }
+  return false;
+}
+
+/* ================= PROFIL ================= */
+async function renderProfile(){
+  const u = await loadMe();
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>👤 Mein Profil</h2><p>Deine hinterlegten Kontodaten.</p></div></div>
+  <div class="glass" style="padding:26px;max-width:520px;">
+    <div style="display:flex;gap:18px;align-items:center;margin-bottom:20px;">
+      <div class="avatar" style="width:60px;height:60px;font-size:20px;">${u.username.slice(0,2).toUpperCase()}</div>
+      <div><h3>${u.username}${u.isDeveloper?'<span class="dev-badge">DEV</span>':""}</h3>
+      <span class="badge ${roleBadgeClass(u.role)}">${u.role}</span></div>
+    </div>
+    <p style="font-size:13.5px;color:var(--dim);line-height:2;">
+      Discord: <b style="color:#fff;">${u.discord}</b><br>
+      Discord-ID: <b style="color:#fff;">${u.discordId}</b><br>
+      Ebene: <b style="color:#fff;">${u.ebene}</b><br>
+      Mitglied seit: <b style="color:#fff;">${u.createdAt}</b>
+    </p>
+  </div>`;
+}
+
+/* ================= IP-LOGGER (nur Entwickler) ================= */
+async function renderIpLogger(){
+  const data = await api("/ip-logs");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>🌐 IP-Logger</h2><p>Nur für Entwickler sichtbar.</p></div></div>
+  <div class="glass" style="padding:20px;">
+    ${tableHtml(["Benutzer","IP","Gerät","Zeit"], data.ipLogs.map(l=>`
+      <tr><td><b>${l.username}</b></td><td>${l.ip}</td><td style="max-width:300px;white-space:normal;font-size:11px;color:var(--dim);">${l.device}</td><td>${l.date}</td></tr>`))}
+  </div>`;
+}
+
+/* ================= EINSTELLUNGEN ================= */
+async function renderSettings(){
+  const data = await api("/settings");
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>⚙️ Einstellungen</h2><p>Systemweite Einstellungen.</p></div></div>
+  <div class="glass" style="padding:24px;max-width:520px;">
+    <label style="display:flex;align-items:center;gap:10px;font-size:13.5px;">
+      <input type="checkbox" ${data.settings.maintenance?"checked":""} onchange="toggleMaintenance(this.checked)"> Wartungsmodus aktivieren
+    </label>
+  </div>`;
+}
+async function toggleMaintenance(val){ try{ await api("/settings",{method:"PUT",body:JSON.stringify({maintenance:val})}); toast("Gespeichert"); }catch(e){ toast(e.message,"error"); } }
+
+/* ================= PLAYER PROFILE ================= */
+async function renderPlayerProfile(id){
+  const data = await api("/players/"+id);
+  document.getElementById("content").innerHTML = `
+  <div class="page-title"><div><h2>${data.player.robloxName}</h2><p>${data.player.discordName} · ${data.player.discordId}</p></div></div>
+  <div class="glass" style="padding:20px;">
+    <h3 style="margin-bottom:10px;font-size:13.5px;">Warns</h3>
+    ${tableHtml(["Grund","Datum","Bearbeiter"],data.warns.map(w=>`<tr><td>${w.reason}</td><td>${w.date}</td><td>${w.moderator}</td></tr>`))}
+  </div>`;
+}
+
+/* ================= INIT ================= */
+route();
+</script>
+</body>
+</html>

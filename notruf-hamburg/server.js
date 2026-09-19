@@ -14,7 +14,20 @@ app.use(express.static(path.join(__dirname, "public"), {
 }));
 
 const JWT_SECRET = process.env.JWT_SECRET || "nrhh_super_secret_dev_key_change_me";
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") {
+  console.warn("⚠️  JWT_SECRET ist nicht gesetzt! Bitte in den Hosting-Einstellungen eine zufällige Zeichenkette hinterlegen.");
+}
 const PORT = process.env.PORT || 3000;
+
+/* ============ HEALTH-CHECK (für Render & Co.) ============ */
+app.get("/api/health", (req, res) => {
+  try {
+    const db = DB.load();
+    res.json({ ok: true, version: versionOf(db), users: db.users.length, uptime: Math.round(process.uptime()) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: "Datenbank nicht lesbar" });
+  }
+});
 
 /* ============ HELPERS ============ */
 function sanitizeUser(u) {
@@ -699,4 +712,4 @@ app.put("/api/rank-info", auth, requireLevel(6), (req, res) => {
   res.json({ ok: true });
 });
 
-app.listen(PORT, () => console.log(`🚨 Notruf Hamburg Verwaltung läuft auf Port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`🚨 Notruf Hamburg Verwaltung läuft auf Port ${PORT}`));

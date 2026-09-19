@@ -2,7 +2,11 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 
-const DATA_DIR = path.join(__dirname, "data");
+/* Datenordner:
+   - lokal:   ./data
+   - Render:  per Umgebungsvariable DATA_DIR auf eine "Disk" zeigen lassen
+              (z. B. DATA_DIR=/var/data), damit Daten Neustarts ueberleben. */
+const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(__dirname, "data");
 const DB_PATH = path.join(DATA_DIR, "db.json");
 
 /* ============ EBENEN-HIERARCHIE ============
@@ -46,7 +50,7 @@ function hasLevel(user, min) {
 
 /* ============ DB LOAD/SAVE ============ */
 function ensureDb() {
-  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR);
+  if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify(seed(), null, 2));
 }
 function load() { return JSON.parse(fs.readFileSync(DB_PATH, "utf-8")); }

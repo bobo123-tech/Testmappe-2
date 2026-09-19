@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Notruf Hamburg · Verwaltungspanel</title>
+<title>Notruf Hamburg · Verwaltungspanel v1.0</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <link rel="icon" href="data:,">
 <style>
@@ -66,8 +66,7 @@ body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);co
 .lg-err svg{width:15px;height:15px;flex-shrink:0;}
 .lg-foot{margin-top:28px;font-size:11px;color:var(--dim2);text-align:center;}
 .lg-foot b{color:var(--g);}
-.demo{margin-top:18px;padding:13px 15px;border-radius:12px;background:rgba(255,255,255,.025);border:1px dashed var(--line2);font-size:10.5px;color:var(--dim);line-height:1.85;}
-.demo b{color:#aab4c6;}
+.lg-foot span{color:var(--g3);font-weight:700;}
 @keyframes up{from{opacity:0;transform:translateY(22px);}to{opacity:1;transform:none;}}
 
 /* ---------- FORM ---------- */
@@ -130,7 +129,13 @@ select.inp{cursor:pointer;}
 .av-sm{width:30px;height:30px;font-size:11.5px;}
 .av-md{width:46px;height:46px;font-size:16px;border-radius:13px;}
 .av-lg{width:62px;height:62px;font-size:23px;border-radius:17px;}
-#ct{padding:24px 26px 60px;flex:1;animation:pgIn .4s cubic-bezier(.2,.8,.2,1);}
+#ct{padding:24px 26px 40px;flex:1;animation:pgIn .4s cubic-bezier(.2,.8,.2,1);}
+#foot{padding:14px 26px 18px;border-top:1px solid var(--line);font-size:10.5px;color:var(--dim2);letter-spacing:.3px;}
+#foot b{color:var(--dim);}
+#foot span{color:var(--g3);font-weight:700;}
+.sb-ver{padding:10px 4px 3px;text-align:center;font-size:9px;color:var(--dim2);line-height:1.6;letter-spacing:.3px;}
+.sb-ver b{color:var(--dim);}
+.sb-ver span{color:var(--g3);font-weight:700;}
 @keyframes pgIn{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:none;}}
 
 /* ---------- CARDS ---------- */
@@ -257,6 +262,13 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 .prg{height:5px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden;}
 .prg i{display:block;height:100%;background:linear-gradient(90deg,var(--g),var(--g3));border-radius:5px;transition:width .9s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px var(--glow);}
 
+/* ip logger */
+.ipv{display:inline-flex;align-items:center;gap:6px;font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:#d6f5e2;cursor:pointer;padding:3px 9px;border-radius:8px;background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.22);transition:.2s;}
+.ipv:hover{background:rgba(34,197,94,.16);border-color:rgba(34,197,94,.45);}
+.ipv svg{width:12px;height:12px;opacity:.65;}
+.ipraw{font-size:9.5px;color:var(--dim2);font-family:ui-monospace,monospace;margin-top:4px;}
+.ua{font-size:11.5px;color:#c3cbd8;}
+
 /* shift ring */
 .ring{width:210px;height:210px;border-radius:50%;margin:0 auto 20px;display:flex;align-items:center;justify-content:center;position:relative;
   background:conic-gradient(var(--g) calc(var(--p,0)*1%),rgba(255,255,255,.055) 0);transition:background .6s linear;box-shadow:0 0 44px rgba(34,197,94,.18);}
@@ -318,8 +330,7 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
         <div class="fg"><label>Passwort</label><input class="inp" id="lp" type="password" placeholder="••••••••" autocomplete="current-password" required></div>
         <button class="btn b-g b-full" style="padding:13px;" type="submit"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3z"/><path d="m9 12 2 2 4-4"/></svg>Anmelden</button>
       </form>
-      <div class="demo"><b>Demo-Zugänge:</b><br>Entwickler: Chris / mrpRHVO1<br>Owner: MaxOwner / owner123<br>Teamleitung: SaraTeamleitung / team123<br>Admin: MaxAdmin / admin123<br>Jr. Mod: LenaJrMod / jrmod123</div>
-      <div class="lg-foot">© 2026 Notruf Hamburg · Entwickelt von <b>Christopher</b></div>
+      <div class="lg-foot">Entwickelt von <b>Christopher</b> · © 2026 Notruf Hamburg · <span id="lgver">v1.0</span></div>
     </div>
   </div>
 </div>
@@ -329,7 +340,8 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
   <aside id="sb">
     <div class="sb-h"><div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17v-3.5a6 6 0 0 1 12 0V17"/><rect x="3.8" y="17" width="16.4" height="3.2" rx="1.6"/><path d="M12 3.2v2.1M4.7 6.6 6.2 8.1M19.3 6.6 17.8 8.1"/></svg></div><div><h1>Notruf Hamburg</h1><span>VERWALTUNGSPANEL</span></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sb-f"><button class="btn b-x b-full" onclick="doLogout()"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button></div>
+    <div class="sb-f"><button class="btn b-x b-full" onclick="doLogout()"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
+      <div class="sb-ver">Entwickelt von <b>Christopher</b> · © 2026 · <span id="sbver">v1.0</span></div></div>
   </aside>
   <div id="main">
     <header id="top">
@@ -346,6 +358,7 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
       </div>
     </header>
     <main id="ct"></main>
+    <footer id="foot">Entwickelt von <b>Christopher</b> · © 2026 Notruf Hamburg · Version <span id="footv">v1.0</span></footer>
   </div>
 </div>
 
@@ -392,6 +405,7 @@ const I={
  plus:'<path d="M12 5v14M5 12h14"/>',
  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
  srch:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+ copy:'<rect width="13" height="13" x="8" y="8" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
  x:'<path d="M6 6l12 12M18 6 6 18"/>',
  play:'<polygon points="6 3 20 12 6 21 6 3"/>',
  siren:'<path d="M6 17v-3.5a6 6 0 0 1 12 0V17"/><rect x="3.8" y="17" width="16.4" height="3.2" rx="1.6"/><path d="M12 3.2v2.1M4.7 6.6 6.2 8.1M19.3 6.6 17.8 8.1"/>',
@@ -472,6 +486,16 @@ async function api(p,o={}){
   return d;
 }
 let ME=null;
+let VER='v1.0';
+function applyVer(){
+  document.title='Notruf Hamburg · Verwaltungspanel '+VER;
+  const a=document.getElementById('lgver'),b=document.getElementById('sbver'),c=document.getElementById('footv');
+  if(a)a.textContent=VER; if(b)b.textContent=VER; if(c)c.textContent=VER;
+}
+async function loadVer(){
+  try{const r=await fetch('/api/version',{cache:'no-store'});const d=await r.json();if(d&&d.version)VER=d.version;}catch{}
+  applyVer();
+}
 const S={pg:{},f:{},PS:10};
 const pg=k=>S.pg[k]||1, spg=(k,v)=>{S.pg[k]=v;rt();};
 
@@ -890,7 +914,7 @@ async function tgU(id){try{await api('/users/'+id+'/toggle',{method:'POST'});toa
 async function delU(id){try{await api('/users/'+id,{method:'DELETE'});toast('Benutzer gelöscht','i');PG.users(ME);}catch(e){toast(e.message,'e');}}
 
 /* ============ SICHERHEIT / LOGS ============ */
-PG.security=async()=>{const{sessions}=await api('/security/sessions');const{logs}=await api('/logs');
+PG.security=async()=>{const sd=await api('/security/sessions');const{sessions}=sd;const canSeeIp=!!sd.canSeeIp;const{logs}=await api('/logs');
  const q=(S.f.sq||'').toLowerCase();
  const items=logs.filter(l=>/Login|Logout|Benutzer|Passwort|Rolle|gelöscht/i.test(l.action)).filter(l=>!q||JSON.stringify(l).toLowerCase().includes(q));
  ct.innerHTML=ph('ushield','Audit-Übersicht','Login-Versuche und kritische administrative Aktionen')+`
@@ -900,9 +924,10 @@ PG.security=async()=>{const{sessions}=await api('/security/sessions');const{logs
   <div class="lr-m"><div class="t"><b>${esc(l.user)}</b> · <span style="color:var(--dim)">${esc(l.role)}</span> · ${esc(l.action)}${l.target&&l.target!=='-'?` · <span style="color:var(--g3)">${esc(l.target)}</span>`:''}</div>
   <div class="d">${l.date} ${l.time} Uhr</div></div></div>`).join('')||empty()}</div></div>
  <div class="sl">Login-Sitzungen</div>
- <div class="card cpad">${table(['Benutzer','IP-Adresse','Gerät','Zeitpunkt'],sessions.slice(0,25).map(s=>`<tr>
-  <td><b>${esc(s.username)}</b></td><td class="mono">${esc(s.ip)}</td>
-  <td style="max-width:320px;white-space:normal;font-size:10.5px;color:var(--dim)">${esc((s.device||'').slice(0,90))}</td><td class="mono">${s.date}</td></tr>`))}</div>`;};
+ <div class="card cpad">${canSeeIp?table(['Benutzer','IP-Adresse','Gerät','Zeitpunkt'],sessions.slice(0,25).map(s=>`<tr>
+  <td><b>${esc(s.username)}</b></td><td><span class="ipv" onclick="copyIp('${esc(s.ip)}')" title="Klicken zum Kopieren">${esc(s.ip)}${svg('copy')}</span></td>
+  <td style="max-width:320px;white-space:normal;font-size:10.5px;color:var(--dim)">${esc((s.device||'').slice(0,90))}</td><td class="mono">${s.date}</td></tr>`)):
+  `<div class="emp"><div class="emp-ic">${svg('lock')}</div><p>IP-Adressen sind nur für den Entwickler sichtbar.</p></div>`}</div>`;};
 
 PG.logs=async()=>{const q=S.f.lq||'';const{logs}=await api('/logs?q='+encodeURIComponent(q));
  ct.innerHTML=ph('logs','Aktivitätsprotokoll','Vollständiges, unveränderliches Logbuch aller Aktionen')+`
@@ -913,10 +938,73 @@ PG.logs=async()=>{const q=S.f.lq||'';const{logs}=await api('/logs?q='+encodeURIC
   <div class="lr-m"><div class="t"><b>${esc(l.user)}</b> · <span style="color:var(--dim)">${esc(l.role)}</span> · ${esc(l.action)}${l.target&&l.target!=='-'?` · <span style="color:var(--g3)">${esc(l.target)}</span>`:''}</div>
   <div class="d">[${l.date} | ${l.time} Uhr]</div></div>${rb(l.role)}</div>`).join('')||empty()}</div>${pager(logs.length,'lg')}</div>`;};
 
-PG.iplog=async()=>{const{ipLogs}=await api('/ip-logs');
- ct.innerHTML=ph('glob','IP-Logger','Nur für Entwickler sichtbar')+`<div class="card cpad">
- ${table(['Benutzer','IP','Gerät','Zeit'],ipLogs.slice(0,60).map(l=>`<tr><td><b>${esc(l.username)}</b></td><td class="mono">${esc(l.ip)}</td>
- <td style="max-width:340px;white-space:normal;font-size:10.5px;color:var(--dim)">${esc((l.device||'').slice(0,100))}</td><td class="mono">${l.date}</td></tr>`))}</div>`;};
+PG.iplog=async()=>{
+ let d={};try{d=await api('/ip-logs');}catch(e){}
+ if(d.error){ct.innerHTML=ph('lock','Kein Zugriff','Der IP-Logger ist ausschließlich für den Entwickler sichtbar.');return;}
+ const list=d.ipLogs||[];
+ IPDATA=list;
+ const q=(S.f.ipq||'').toLowerCase();
+ const l=list.filter(x=>!q||JSON.stringify(x).toLowerCase().includes(q));
+ ct.innerHTML=ph('glob','IP-Logger','Nur für dich sichtbar · jede Anmeldung mit echter IP-Adresse',
+  `<button class="btn b-x" onclick="PG.iplog()">${svg('refr')} Aktualisieren</button>
+   ${list.length?`<button class="btn b-r" onclick="ask('Wirklich den <b>kompletten IP-Logger entleeren</b>? Alle ${list.length} Einträge werden unwiderruflich gelöscht.',clearIpLogs)">${svg('trash')} Logger entleeren</button>`:''}`)+
+ `<div class="card cpad" style="margin-bottom:17px;display:flex;gap:12px;align-items:center;background:linear-gradient(120deg,rgba(34,197,94,.09),transparent);flex-wrap:wrap">
+   <span class="ph-ic" style="width:30px;height:30px">${svg('lock')}</span>
+   <p style="font-size:12.5px;color:var(--dim);line-height:1.6;flex:1;min-width:220px">Dieser Bereich ist <b style="color:#fff">ausschließlich für den Entwickler</b> sichtbar und bearbeitbar. Kein anderes Teammitglied kann IP-Adressen einsehen oder Einträge ändern.</p>
+   <span class="bg bg-o">${svg('lock')} Nur Entwickler</span></div>
+ <div class="card cpad">
+  <div class="tb">
+   <input class="inp" style="flex:1;max-width:380px" placeholder="Suche: Benutzer, IP, Gerät, Notiz..." value="${esc(S.f.ipq||'')}" oninput="S.f.ipq=this.value;S.pg.ip=1;PG.iplog()">
+   <span class="bg bg-g" style="margin-left:auto">${list.length} Eintr${list.length===1?'ag':'äge'}</span></div>
+  ${table(['Benutzer','IP-Adresse','Typ','Gerät','Zeitpunkt','Notiz',''],page(l,'ip').map(x=>{
+    const k=ipKind(x.ip),u=uaInfo(x.device);
+    return `<tr>
+     <td><b>${esc(x.username)}</b></td>
+     <td><span class="ipv" onclick="copyIp('${esc(x.ip)}')" title="Klicken zum Kopieren">${esc(x.ip)}${svg('copy')}</span>
+       ${x.rawIp&&x.rawIp!==x.ip?`<div class="ipraw">roh: ${esc(x.rawIp)}</div>`:''}</td>
+     <td><span class="bg ${k.c}">${k.k}</span></td>
+     <td style="max-width:270px;white-space:normal"><span class="ua" title="${esc(x.device||'')}">${esc(u.b)}${u.o?' · '+esc(u.o):''}</span></td>
+     <td class="mono">${esc(x.date)}</td>
+     <td style="color:var(--dim);font-size:11.5px;max-width:210px;white-space:normal">${esc(x.note||'—')}</td>
+     <td><button class="icb" title="Notiz bearbeiten" onclick="editIp('${x.id}')">${svg('pen')}</button>
+      <button class="icb dz" title="Eintrag löschen" onclick="ask('Eintrag von <b>${esc(x.username)}</b> (${esc(x.ip)}) löschen?',()=>delIp('${x.id}'))">${svg('trash')}</button></td></tr>`;}))}
+  ${pager(l.length,'ip')}</div>`;};
+
+let IPDATA=[];
+const ipKind=ip=>{
+  if(!ip||ip==='unbekannt')return{k:'Unbekannt',c:'bg-x'};
+  if(ip==='127.0.0.1'||ip==='localhost')return{k:'Lokal (Server)',c:'bg-b'};
+  if(/^(10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)/.test(ip))return{k:'Privat / LAN',c:'bg-o'};
+  if(ip.includes(':'))return{k:/^(f[cd]|fe80)/i.test(ip)?'IPv6 (lokal)':'Öffentlich (IPv6)',c:'bg-p'};
+  return{k:'Öffentlich (IPv4)',c:'bg-g'};};
+function uaInfo(ua){
+  if(!ua||ua==='Unbekannt'||ua==='ausgeblendet')return{b:'Unbekanntes Gerät',o:''};
+  const mv=re=>{const m=ua.match(re);return m?m[1].split('.')[0]:'';};
+  let b='Browser';
+  if(/Edg\//.test(ua))b='Edge '+mv(/Edg\/([\d.]+)/);
+  else if(/OPR\//.test(ua))b='Opera '+mv(/OPR\/([\d.]+)/);
+  else if(/Chrome\//.test(ua))b='Chrome '+mv(/Chrome\/([\d.]+)/);
+  else if(/Firefox\//.test(ua))b='Firefox '+mv(/Firefox\/([\d.]+)/);
+  else if(/Safari\//.test(ua))b='Safari '+mv(/Version\/([\d.]+)/);
+  let o='';
+  if(/Windows NT 10/.test(ua))o='Windows 10/11';
+  else if(/Windows/.test(ua))o='Windows';
+  else if(/Android/.test(ua))o='Android';
+  else if(/iPhone|iPad/.test(ua))o='iOS';
+  else if(/Mac OS X/.test(ua))o='macOS';
+  else if(/Linux/.test(ua))o='Linux';
+  return {b:b.trim(),o};}
+function copyIp(ip){try{navigator.clipboard.writeText(ip);toast('IP kopiert: '+ip,'i');}catch{prompt('IP-Adresse:',ip);}}
+function editIp(id){const x=IPDATA.find(y=>y.id===id);if(!x)return;
+ modal(`<h3>${svg('pen')}Eintrag bearbeiten</h3>
+  <div class="kv"><span class="k">Benutzer</span><span class="v">${esc(x.username)}</span></div>
+  <div class="kv"><span class="k">IP-Adresse</span><span class="v mono">${esc(x.ip)}</span></div>
+  <div class="kv"><span class="k">Zeitpunkt</span><span class="v">${esc(x.date)}</span></div>
+  <div class="fg" style="margin-top:14px"><label>Notiz</label><textarea class="inp" id="ipnote" placeholder="z. B. verdächtig, VPN, Doppel-Account ...">${esc(x.note||'')}</textarea></div>
+  <div class="ma"><button class="btn b-x" onclick="cm()">Abbrechen</button><button class="btn b-g" onclick="saveIp('${id}')">${svg('save')} Speichern</button></div>`);}
+async function saveIp(id){try{await api('/ip-logs/'+id,{method:'PUT',body:JSON.stringify({note:ipnote.value})});cm();toast('Notiz gespeichert');PG.iplog();}catch(e){toast(e.message,'e');}}
+async function delIp(id){try{await api('/ip-logs/'+id,{method:'DELETE'});toast('Eintrag gelöscht','i');PG.iplog();}catch(e){toast(e.message,'e');}}
+async function clearIpLogs(){try{const d=await api('/ip-logs',{method:'DELETE'});toast('IP-Logger entleert – '+d.removed+' Einträge gelöscht','i');PG.iplog();}catch(e){toast(e.message,'e');}}
 
 /* ============ STATUS ============ */
 PG.status=async()=>{const d=await api('/system-status');
@@ -933,7 +1021,8 @@ PG.status=async()=>{const d=await api('/system-status');
 /* ============ CONTENT PAGES ============ */
 async function cPage(type,ic,title,sub,u){
  const{items}=await api('/content/'+type);const ok=u.isDeveloper||lvlOf(u.role)>=4;
- ct.innerHTML=ph(ic,title,sub,ok?`<button class="btn b-g" onclick="ncM('${type}')">${svg('plus')} Neuer Eintrag</button>`:'')+
+ const verBtn=(type==='changelog'&&u.isDeveloper)?`<span class="bg bg-g" title="Aktuelle Version">${VER}</span> <button class="btn b-x b-s" onclick="setVerM()">${svg('save')} Version setzen</button> `:'';
+ ct.innerHTML=ph(ic,title,sub,verBtn+(ok?`<button class="btn b-g" onclick="ncM('${type}')">${svg('plus')} Neuer Eintrag</button>`:''))+
  `<div class="g" style="gap:13px">${items.length?items.map(i=>`<div class="card hv cpad">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
    <div style="display:flex;gap:12px;align-items:center"><div class="t-ic" style="width:36px;height:36px">${svg(ic)}</div>
@@ -947,12 +1036,21 @@ PG.docs=u=>cPage('document','doc','Dokumenten-Archiv','Offizielle Vorlagen und i
 PG.book=u=>cPage('handbook','book','Regelwerk-Handbuch','Interne Regeln und Arbeitsanweisungen für das Team',u);
 PG.rules=u=>cPage('rules','list','Verhaltensregeln','Interne Richtlinien für alle Teammitglieder',u);
 PG.changelog=u=>cPage('changelog','git','Entwickler-Protokoll','Letzte Updates und Änderungen am Admin-Portal',u);
+function setVerM(){modal(`<h3>${svg('save')}Versionsnummer setzen</h3>
+ <p style="font-size:12.5px;color:var(--dim);line-height:1.6;margin-bottom:14px">Wird automatisch hochgezählt, sobald du einen Changelog-Eintrag veröffentlichst (z. B. v1.0 → v1.01 → v1.02). Hier kannst du sie zusätzlich manuell setzen.</p>
+ <div class="fg"><label>Version</label><input class="inp" id="verin" value="${VER}" placeholder="v1.0"></div>
+ <div class="ma"><button class="btn b-x" onclick="cm()">Abbrechen</button><button class="btn b-g" onclick="setVer()">${svg('save')} Speichern</button></div>`);}
+async function setVer(){try{const d=await api('/settings',{method:'PUT',body:JSON.stringify({version:verin.value})});
+ cm();VER=d.version;applyVer();toast('Version gesetzt: '+VER);rt();}catch(e){toast(e.message,'e');}}
 function ncM(t){modal(`<h3>${svg('plus')} Neuer Eintrag</h3><div class="fg"><label>Titel</label><input class="inp" id="c1"></div>
  <div class="fg"><label>Inhalt</label><textarea class="inp" id="c2" style="min-height:130px"></textarea></div>
  <label style="display:flex;gap:9px;align-items:center;font-size:12.5px;margin-bottom:8px"><input type="checkbox" id="c3"> Anheften</label>
  <div class="ma"><button class="btn b-x" onclick="cm()">Abbrechen</button><button class="btn b-g" onclick="ncS('${t}')">${svg('save')} Speichern</button></div>`);}
-async function ncS(t){try{await api('/content/'+t,{method:'POST',body:JSON.stringify({title:c1.value,body:c2.value,pinned:c3.checked})});
- cm();toast('Eintrag erstellt');rt();}catch(e){toast(e.message,'e');}}
+async function ncS(t){try{const d=await api('/content/'+t,{method:'POST',body:JSON.stringify({title:c1.value,body:c2.value,pinned:c3.checked})});
+ cm();
+ if(t==='changelog'&&d.version){VER=d.version;applyVer();toast('Changelog veröffentlicht · Version jetzt '+d.version);}
+ else toast('Eintrag erstellt');
+ rt();}catch(e){toast(e.message,'e');}}
 async function dcM(t,id){try{await api(`/content/${t}/${id}`,{method:'DELETE'});toast('Gelöscht','i');rt();}catch(e){toast(e.message,'e');}}
 
 /* ============ BENACHRICHTIGUNGEN / ABWESENHEIT ============ */
@@ -1043,6 +1141,8 @@ async function mtn(v){try{await api('/settings',{method:'PUT',body:JSON.stringif
 
 /* ============ START ============ */
 const nav_=document.getElementById('nav');
+applyVer();
+loadVer();
 rt();
 </script>
 </body>

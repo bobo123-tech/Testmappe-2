@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const DB = require("./db");
 
 const app = express();
+app.set("trust proxy", true);   // echte Besucher-IP hinter Proxys ermitteln
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public"), {
   setHeaders: (res, file) => {
@@ -27,6 +28,30 @@ function log(db, user, action, target) {
     date: d.toLocaleDateString("de-DE"), time: d.toTimeString().slice(0, 5), ts: Date.now(),
   });
 }
+/* ============ IP-HILFEN ============ */
+function normIp(ip) {
+  if (!ip) return "unbekannt";
+  let v = String(ip).trim();
+  if (v.startsWith("::ffff:")) v = v.slice(7);      // IPv4-in-IPv6 -> reine IPv4
+  if (v === "::1") v = "127.0.0.1";
+  if (v === "::") v = "127.0.0.1";
+  return v;
+}
+function clientIp(req) {
+  const fwd = (req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return normIp(fwd || req.ip || (req.socket && req.socket.remoteAddress) || "");
+}
+
+/* ============ VERSION ============ */
+const DEFAULT_VERSION = "v1.0";
+const versionOf = db => (db && db.settings && db.settings.version) || DEFAULT_VERSION;
+function bumpVersion(v) {
+  const m = /^v?(\d+)[.,](\d+)$/.exec(String(v || DEFAULT_VERSION).trim());
+  const major = m ? parseInt(m[1], 10) : 1;
+  const minor = (m ? parseInt(m[2], 10) : 0) + 1;
+  return "v" + major + "." + (minor < 10 ? "0" + minor : String(minor));
+}
+
 function notify(db, userId, message) {
   db.notifications.unshift({ id: DB.uid("n"), userId, message, date: new Date().toLocaleString("de-DE"), read: false });
 }
@@ -108,7 +133,13 @@ app.post("/api/auth/login", (req, res) => {
     return res.status(401).json({ error: "Benutzername oder Passwort falsch, oder Konto deaktiviert." });
   }
   const token = jwt.sign({ uid: user.id, tv: user.tokenVersion }, JWT_SECRET, { expiresIn: "12h" });
-  db.ipLogs.unshift({ id: DB.uid("ip"), userId: user.id, username: user.username, ip: req.ip, device: req.headers["user-agent"] || "Unbekannt", date: new Date().toLocaleString("de-DE") });
+  const rawIp = String(req.ip || (req.socket && req.socket.remoteAddress) || "");
+  db.ipLogs.unshift({
+    id: DB.uid("ip"), userId: user.id, username: user.username,
+    ip: clientIp(req), rawIp, note: "", ts: Date.now(),
+    device: req.headers["user-agent"] || "Unbekannt",
+    date: new Date().toLocaleString("de-DE"),
+  });
   log(db, user, "Login", "-");
   DB.save(db);
   res.cookie("nh_token", token, cookieOpts(req));
@@ -499,10 +530,50 @@ app.get("/api/logs", auth, requireLevel(5), (req, res) => {
 });
 
 /* ============ SICHERHEIT (Level >= 5) ============ */
-app.get("/api/security/sessions", auth, requireLevel(5), (req, res) => res.json({ sessions: req.db.ipLogs.slice(0, 100) }));
+app.get("/api/security/sessions", auth, requireLevel(5), (req, res) => {
+  const isDev = !!req.user.isDeveloper;
+  const sessions = [...req.db.ipLogs].sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 100)
+    .map(s => isDev ? s : { ...s, ip: "••••••• (nur Entwickler)", device: "ausgeblendet" });
+  res.json({ sessions, canSeeIp: isDev });
+});
 
 /* ============ IP-LOGGER (nur Entwickler) ============ */
-app.get("/api/ip-logs", auth, requireDev, (req, res) => res.json({ ipLogs: req.db.ipLogs }));
+app.get("/api/ip-logs", auth, requireDev, (req, res) => {
+  const list = [...req.db.ipLogs].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  res.json({ ipLogs: list, count: list.length });
+});
+app.put("/api/ip-logs/:id", auth, requireDev, (req, res) => {
+  const db = req.db;
+  const e = db.ipLogs.find(x => x.id === req.params.id);
+  if (!e) return res.status(404).json({ error: "Eintrag nicht gefunden." });
+  e.note = String(req.body.note || "").slice(0, 300);
+  log(db, req.user, "IP-Logger: Notiz bearbeitet", e.username + " / " + e.ip);
+  DB.save(db);
+  res.json({ ok: true, entry: e });
+});
+app.delete("/api/ip-logs/:id", auth, requireDev, (req, res) => {
+  const db = req.db;
+  const e = db.ipLogs.find(x => x.id === req.params.id);
+  if (!e) return res.status(404).json({ error: "Eintrag nicht gefunden." });
+  db.ipLogs = db.ipLogs.filter(x => x.id !== req.params.id);
+  log(db, req.user, "IP-Logger: Eintrag gelöscht", e.username + " / " + e.ip);
+  DB.save(db);
+  res.json({ ok: true });
+});
+app.delete("/api/ip-logs", auth, requireDev, (req, res) => {
+  const db = req.db;
+  const removed = db.ipLogs.length;
+  db.ipLogs = [];
+  log(db, req.user, "IP-Logger entleert", removed + " Einträge entfernt");
+  DB.save(db);
+  res.json({ ok: true, removed });
+});
+
+/* ============ VERSION (öffentlich – Login-Seite zeigt sie an) ============ */
+app.get("/api/version", (req, res) => {
+  const db = DB.load();
+  res.json({ version: versionOf(db), note: db.settings.versionNote || "", date: db.settings.versionDate || "" });
+});
 
 /* ============ SYSTEM-STATUS ============ */
 app.get("/api/system-status", auth, (req, res) => res.json({ status: req.db.settings.systemStatus, maintenance: req.db.settings.maintenance }));
@@ -518,6 +589,15 @@ app.put("/api/system-status", auth, requireLevel(5), (req, res) => {
 app.get("/api/settings", auth, requireLevel(5), (req, res) => res.json({ settings: req.db.settings }));
 app.put("/api/settings", auth, requireLevel(5), (req, res) => {
   const db = req.db;
+  if (req.body.version !== undefined) {
+    if (!req.user.isDeveloper) return res.status(403).json({ error: "Nur der Entwickler kann die Versionsnummer ändern." });
+    const v = String(req.body.version).trim();
+    if (!/^v?\d+[.,]\d+$/.test(v)) return res.status(400).json({ error: "Ungültige Version (Beispiel: v1.0 oder v1.01)." });
+    db.settings.version = v.startsWith("v") ? v : "v" + v;
+    log(db, req.user, "Versionsnummer gesetzt", db.settings.version);
+    DB.save(db);
+    return res.json({ ok: true, version: db.settings.version });
+  }
   db.settings.maintenance = !!req.body.maintenance;
   log(db, req.user, "Einstellungen geändert", "Wartungsmodus: " + (db.settings.maintenance ? "An" : "Aus"));
   DB.save(db);
@@ -532,10 +612,19 @@ app.get("/api/content/:type", auth, (req, res) => {
 app.post("/api/content/:type", auth, requireLevel(4), (req, res) => {
   const db = req.db;
   const item = { id: DB.uid("c"), type: req.params.type, title: req.body.title, body: req.body.body, pinned: !!req.body.pinned, author: req.user.username, date: new Date().toISOString().slice(0, 10) };
+  let newVersion = null;
+  if (req.params.type === "changelog") {
+    newVersion = bumpVersion(versionOf(db));
+    item.version = newVersion;
+    db.settings.version = newVersion;
+    db.settings.versionNote = item.title;
+    db.settings.versionDate = item.date;
+  }
   db.contents.unshift(item);
-  log(db, req.user, "Inhalt erstellt (" + req.params.type + ")", item.title);
+  log(db, req.user, req.params.type === "changelog" ? "Changelog veröffentlicht" : "Inhalt erstellt (" + req.params.type + ")",
+      item.title + (newVersion ? " (" + newVersion + ")" : ""));
   DB.save(db);
-  res.json({ item });
+  res.json({ item, version: db.settings.version });
 });
 app.delete("/api/content/:type/:id", auth, requireLevel(4), (req, res) => {
   const db = req.db;

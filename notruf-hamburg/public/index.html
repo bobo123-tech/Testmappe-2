@@ -277,6 +277,14 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 .ring-i .tm{font-size:31px;font-weight:900;letter-spacing:-1.6px;font-variant-numeric:tabular-nums;}
 .ring-i svg{width:44px;height:44px;opacity:.45;}
 .ring-i .lb{font-size:10px;color:var(--dim2);margin-top:3px;letter-spacing:.7px;text-transform:uppercase;font-weight:700;}
+.ring.warn{background:conic-gradient(var(--org) calc(var(--p,0)*1%),rgba(255,255,255,.055) 0);box-shadow:0 0 44px rgba(245,158,11,.22);}
+.swarn{display:flex;align-items:center;justify-content:center;gap:8px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.4);color:#fbbf24;
+  padding:11px 15px;border-radius:11px;font-size:12.8px;font-weight:600;max-width:460px;margin:0 auto 16px;animation:shake .5s;}
+.swarn svg{width:15px;height:15px;flex-shrink:0;}
+.swin{max-width:330px;margin:0 auto 22px;}
+.swin-h{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--dim);font-weight:700;letter-spacing:.5px;text-transform:uppercase;margin-bottom:7px;}
+.swin-h b{font-size:13.5px;color:#fff;letter-spacing:-.3px;font-variant-numeric:tabular-nums;}
+.swin-f{font-size:11.5px;color:var(--dim2);margin-top:9px;text-align:center;}
 .pill{display:inline-flex;align-items:center;gap:7px;padding:7px 17px;border-radius:30px;font-weight:800;font-size:12px;margin-bottom:19px;}
 .big{font-size:14.5px;padding:15px 34px;border-radius:14px;}
 
@@ -615,6 +623,8 @@ addEventListener('hashchange',rt);
 /* ============ DASHBOARD ============ */
 PG.dashboard=async u=>{
  const s=await api('/dashboard-stats');
+ let st=null;try{const r=await fetch('/api/health',{cache:'no-store'});st=await r.json();}catch{}
+ const noStore=!!(st&&st.storage&&st.storage.atRisk)&&(u.isDeveloper||lvlOf(u.role)>=5);
  const GR=[
   {t:'MODERATION',m:2,x:[['warn','Warns','Verwarnungen verwalten','warns',2],['hammer','Bans','Sperrungen verwalten','bans',2],
    ['ban','Blacklist','Bewerbungssperren','blacklist',2],['arch','Archiv','Warns & Bans Archiv','archive',2]]},
@@ -622,7 +632,12 @@ PG.dashboard=async u=>{
    ['trophy','Leaderboard','Ranking','leaderboard',0],['users','Team-Übersicht','Alle Mitglieder','team',0],['user','Mein Profil','Deine Daten','profile',0]]},
   {t:'VERWALTUNG',m:5,x:[['ucog','Benutzerverwaltung','Team-Konten','users',5],['shield','Ingame-Rechte','Rollen im Spiel','rights',5],
    ['ushield','Sicherheit','Audit-Logs','security',5],['logs','Logs','Aktivitätsprotokoll','logs',5],['act','System-Status','Dienste prüfen','status',0]]}];
- ct.innerHTML=ph('grid','Dashboard','Willkommen, '+esc(u.username))+`
+ ct.innerHTML=ph('grid','Dashboard','Willkommen, '+esc(u.username))+
+ (noStore?`<div class="swarn" style="max-width:none;align-items:flex-start;text-align:left;margin:0 0 18px;line-height:1.55">
+   <div>${svg('siren')} <b>Daten gehen bei jedem Neustart verloren.</b><br>
+   Die Datenbank liegt im flüchtigen Speicher des Servers (kein <span class="mono">DATA_DIR</span> gesetzt).
+   Neue Benutzer, Warns und Bans sind nach einem Deploy oder Neustart wieder weg.
+   Lösung: dauerhaften Speicher einrichten – siehe <b>ANLEITUNG-RENDER.md, Schritt 9</b>.</div></div>`:'')+`
  <div class="card cpad" style="margin-bottom:22px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(120deg,rgba(34,197,94,.1),transparent)">
   <span class="bg bg-solid" style="background:${RC[u.role]||'#64748b'}">${esc(u.role)}</span>
   <span style="font-size:13px;color:var(--dim)">Hierarchie-Level <b style="color:#fff">#${rankNr(u.role)}</b> · ${u.isDeveloper?'Vollzugriff (Entwickler)':'Ebene '+ebOf(u.role).n}</span>
@@ -642,11 +657,11 @@ PG.dashboard=async u=>{
 let sT=null;
 PG.shift=async()=>{
  const d=await api('/shifts/mine');
- ct.innerHTML=ph('clock','Schicht','Bestätige stündlich deine Anwesenheit – sonst endet die Schicht automatisch.')+
+ ct.innerHTML=ph('clock','Schicht','Der Timer zählt ab Schichtstart hoch · jede Stunde bestätigen · sonst automatisches Ende')+
  `<div class="card cpad" style="text-align:center;padding:34px" id="sbx"></div>
  <div class="sl">LETZTE SCHICHTEN</div><div class="card cpad">${table(['Start','Ende','Status','Bestätigungen','Dauer'],
   d.history.map(s=>`<tr><td>${fdt(s.startTime)}</td><td>${fdt(s.endTime)}</td><td>${sBadge(s.status)}</td><td>${s.confirmCount}</td>
-  <td class="mono">${s.endTime?hms(new Date(s.endTime)-new Date(s.startTime)):'—'}</td></tr>`))}</div>`;
+  <td class="mono">${hms((s.endTime?new Date(s.endTime):Date.now())-new Date(s.startTime))}</td></tr>`))}</div>`;
  sBox(d);clearInterval(sT);
  sT=setInterval(async()=>{if(!location.hash.includes('#shift')||location.hash.includes('shiftadmin'))return clearInterval(sT);
   try{sBox(await api('/shifts/mine'));}catch{}},1000);
@@ -654,25 +669,34 @@ PG.shift=async()=>{
 const sBadge=s=>s==='active'?'<span class="bg bg-g"><span class="dot dot-g"></span>Aktiv</span>':
  s==='ended'?'<span class="bg bg-x">Beendet</span>':'<span class="bg bg-r"><span class="dot dot-r"></span>Auto-beendet</span>';
 function sBox(d){const b=document.getElementById('sbx');if(!b)return;
- if(d.active){const s=d.active,rem=Math.max(0,new Date(s.nextDeadline)-Date.now()),p=Math.min(100,(1-rem/3600000)*100);
-  b.innerHTML=`<span class="pill bg-g"><span class="dot dot-g"></span>Im Dienst seit ${new Date(s.startTime).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} Uhr</span>
-  <div class="ring" style="--p:${p}"><div class="ring-i"><div class="tm">${hms(rem).slice(3)}</div><div class="lb">bis Bestätigung</div></div></div>
-  <p style="color:var(--dim);font-size:12.5px;margin-bottom:20px">Bestätigungen: <b style="color:var(--g3)">${s.confirmCount}</b> · Arbeitszeit: <b style="color:#fff">${hms(Date.now()-new Date(s.startTime))}</b></p>
+ const WI=(d.checkIntervalMin||60)*60000, CD=(d.cooldownMin||10)*60000;
+ if(d.active){
+  const s=d.active, el=Math.max(0,Date.now()-new Date(s.startTime));
+  const rem=Math.max(0,new Date(s.nextDeadline)-Date.now());
+  const p=Math.max(0,Math.min(100,(1-rem/WI)*100));        /* Ring füllt sich im Lauf der Stunde */
+  const warn=rem<=5*60000;                                  /* letzte 5 Minuten: warnen */
+  b.innerHTML=`<span class="pill ${warn?'bg-o':'bg-g'}"><span class="dot ${warn?'':'dot-g'}" ${warn?'style="background:var(--org);box-shadow:0 0 8px var(--org)"':''}></span>Im Dienst seit ${new Date(s.startTime).toLocaleTimeString('de-DE',{hour:'2-digit',minute:'2-digit'})} Uhr</span>
+  <div class="ring ${warn?'warn':''}" style="--p:${p}"><div class="ring-i"><div class="tm" ${warn?'style="color:#fbbf24"':''}>${hms(el)}</div><div class="lb">Schichtdauer</div></div></div>
+  ${warn?`<div class="swarn">${svg('siren')} Nur noch <b>${hms(rem)}</b> – jetzt bestätigen, sonst endet die Schicht automatisch.</div>`:''}
+  <div class="swin"><div class="swin-h"><span>Nächste Bestätigung fällig in</span><b class="mono" ${warn?'style="color:#fbbf24"':''}>${hms(rem)}</b></div>
+   <div class="prg"><i style="width:${p}%"></i></div>
+   <div class="swin-f">Alle ${Math.round(WI/60000)} Minuten bestätigen · Bestätigungen: <b style="color:var(--g3)">${s.confirmCount}</b></div></div>
   <div style="display:flex;gap:11px;justify-content:center;flex-wrap:wrap">
    <button class="btn b-g big" onclick="cfS('${s.id}')">${svg('chk')} Jetzt bestätigen</button>
-   <button class="btn b-x" onclick="ask('Schicht wirklich beenden? Danach gilt ein 10-Minuten-Cooldown.',endS)">${svg('stop')} Beenden</button></div>`;
+   <button class="btn b-x" onclick="ask('Schicht wirklich beenden? Danach gilt ein '+Math.round(CD/60000)+'-Minuten-Cooldown.',endS)">${svg('stop')} Beenden</button></div>`;
   if(rem<=0)setTimeout(PG.shift,1400);
- }else if(d.cooldownRemaining>0){const r=d.cooldownRemaining;
+ }else if(d.cooldownRemaining>0){const r=d.cooldownRemaining,lp=Math.max(0,Math.min(100,(1-r/CD)*100));
   b.innerHTML=`<span class="pill bg-o">${svg('clock')}Cooldown aktiv</span>
-  <div class="ring" style="--p:${100-r/600000*100}"><div class="ring-i"><div class="tm">${hms(r).slice(3)}</div><div class="lb">bis neue Schicht</div></div></div>
-  <p style="color:var(--dim);font-size:12.5px;max-width:420px;margin:0 auto">Zum Schutz vor Missbrauch kannst du erst 10 Minuten nach Schichtende eine neue Schicht starten.</p>`;
+  <div class="ring" style="--p:${lp}"><div class="ring-i"><div class="tm">${hms(r)}</div><div class="lb">bis neue Schicht</div></div></div>
+  <p style="color:var(--dim);font-size:12.5px;max-width:420px;margin:0 auto">Zum Schutz vor Missbrauch kannst du erst ${Math.round(CD/60000)} Minuten nach Schichtende eine neue Schicht starten.</p>`;
  }else{
   b.innerHTML=`<span class="pill bg-x"><span class="dot" style="background:#7d879c"></span>Keine aktive Schicht</span>
   <div class="ring" style="--p:0"><div class="ring-i"><div class="tm" style="font-size:38px">${svg('clock')}</div></div></div>
-  <p style="color:var(--dim);font-size:12.8px;max-width:440px;margin:0 auto 22px;line-height:1.6">Starte deine Schicht, um Aktivität zu tracken. Danach musst du <b style="color:#fff">jede Stunde bestätigen</b> – sonst wird die Schicht automatisch beendet.</p>
+  <p style="color:var(--dim);font-size:12.8px;max-width:440px;margin:0 auto 22px;line-height:1.6">Starte deine Schicht – der Timer zählt ab dann hoch. Du musst <b style="color:#fff">jede Stunde bestätigen</b>, sonst endet die Schicht automatisch. Nach dem Ende gilt eine Pause von <b style="color:#fff">${Math.round(CD/60000)} Minuten</b>, bevor du neu starten kannst.</p>
   <button class="btn b-g big" onclick="stS()">${svg('play')} Schicht starten</button>`;}}
-const stS=async()=>{try{await api('/shifts/start',{method:'POST'});toast('Schicht gestartet – viel Erfolg!');PG.shift();}catch(e){toast(e.message,'e');}};
-const cfS=async id=>{try{await api('/shifts/confirm',{method:'POST',body:JSON.stringify({shiftId:id})});toast('Bestätigt – Timer zurückgesetzt!');PG.shift();}catch(e){toast(e.message,'e');PG.shift();}};
+const stS=async()=>{try{await api('/shifts/start',{method:'POST'});toast('Schicht gestartet – der Timer läuft. Bitte jede Stunde bestätigen!');PG.shift();}catch(e){toast(e.message,'e');}};
+const cfS=async id=>{try{const d=await api('/shifts/confirm',{method:'POST',body:JSON.stringify({shiftId:id})});
+ toast('Anwesenheit bestätigt – nächste Bestätigung in '+(d.checkIntervalMin||60)+' Minuten');PG.shift();}catch(e){toast(e.message,'e');PG.shift();}};
 const endS=async()=>{try{await api('/shifts/end',{method:'POST'});toast('Schicht beendet','i');PG.shift();}catch(e){toast(e.message,'e');}};
 
 PG.shiftadmin=async()=>{

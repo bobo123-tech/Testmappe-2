@@ -21,8 +21,16 @@ services:
         generateValue: true
       - key: NODE_VERSION
         value: "22.11.0"
-      # Für dauerhafte Speicherung: unten bei "Disk" die Kommentare entfernen
-      # und diese Zeile aktivieren (siehe ANLEITUNG-RENDER.md, Schritt 9):
+      # ---- DAUERHAFTER SPEICHER (wichtig!) ----
+      # Ohne eine dieser beiden Einstellungen sind Benutzer, Warns und Bans
+      # nach jedem Neustart/Deploy wieder weg (Render Free hat flüchtigen Speicher).
+      #
+      # Variante A (empfohlen, kostenlos): externe Postgres-Datenbank,
+      # z. B. Neon oder Supabase. Kommentar entfernen und Verbindung eintragen:
+      # - key: DATABASE_URL
+      #   value: postgresql://benutzer:passwort@host:5432/datenbank?sslmode=require
+      #
+      # Variante B (kostenpflichtig): Render-Disk, siehe ANLEITUNG-RENDER.md Schritt 9:
       # - key: DATA_DIR
       #   value: /var/data
     # Optional: dauerhafte Festplatte (nur mit Starter-Plan, ca. 7 $/Monat).

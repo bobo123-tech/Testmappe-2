@@ -2,10 +2,20 @@ const fs = require("fs");
 const path = require("path");
 const bcrypt = require("bcryptjs");
 
-/* Datenordner:
-   - lokal:   ./data
-   - Render:  per Umgebungsvariable DATA_DIR auf eine "Disk" zeigen lassen
-              (z. B. DATA_DIR=/var/data), damit Daten Neustarts ueberleben. */
+/* Speicher – zwei Betriebsarten:
+
+   1) JSON-Datei (Standard, kein Setup nötig)
+      - lokal:   ./data/db.json
+      - Render:  nur mit einer "Disk" dauerhaft, z. B. DATA_DIR=/var/data
+        (siehe ANLEITUNG-RENDER.md, Schritt 9)
+
+   2) Postgres-Datenbank, sobald DATABASE_URL gesetzt ist
+      - dauerhaft, unabhängig von Neustarts/Deploys
+      - funktioniert mit Neon, Supabase oder Render Postgres
+      - Beispiel: postgresql://user:passwort@host:5432/dbname?sslmode=require
+
+   Ohne DATABASE_URL verhält sich alles exakt wie vorher. */
+const DATABASE_URL = process.env.DATABASE_URL || null;
 const DATA_DIR = process.env.DATA_DIR ? path.resolve(process.env.DATA_DIR) : path.join(__dirname, "data");
 const DB_PATH = path.join(DATA_DIR, "db.json");
 
@@ -48,22 +58,103 @@ function hasLevel(user, min) {
   return levelOf(user.role) >= min;
 }
 
-/* ============ DB LOAD/SAVE ============ */
+/* ============ DB LOAD/SAVE ============
+   Die Funktionen load()/save() bleiben SYNCHRON, weil der ganze Server sie so
+   benutzt. Im Postgres-Modus liegt das Dokument deshalb zusätzlich im
+   Arbeitsspeicher (cache) und wird bei jedem Speichern in die Datenbank
+   geschrieben. Für einen Einzel-Instanz-Betrieb (Render Free/Starter mit
+   einer Instanz) ist das dasselbe Verhalten wie vorher bei der JSON-Datei. */
 function ensureDb() {
+  if (DATABASE_URL) return;               // im DB-Modus gibt es keine Datei
   if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
   if (!fs.existsSync(DB_PATH)) fs.writeFileSync(DB_PATH, JSON.stringify(seed(), null, 2));
 }
-function load() { return JSON.parse(fs.readFileSync(DB_PATH, "utf-8")); }
-function save(db) { fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2)); }
+
+let cache = null;        // Postgres-Modus: komplettes Datenobjekt im Speicher
+let pool = null;
+let writeChain = Promise.resolve();
+
+function pgSsl() {
+  /* Neon/Supabase verlangen SSL. Über deren Pooler (pgbouncer) lässt sich das
+     Zertifikat oft nicht gegen die Root-CAs prüfen -> nicht verifizieren. */
+  if (/sslmode=require/.test(DATABASE_URL)) return { rejectUnauthorized: false };
+  return undefined;
+}
+
+/* Einmalig beim Start: Tabelle anlegen, Daten laden (oder neu anlegen). */
+async function init() {
+  if (!DATABASE_URL) { ensureDb(); return { backend: "json" }; }
+  const { Pool } = require("pg");
+  pool = new Pool({ connectionString: DATABASE_URL, ssl: pgSsl(), max: 5 });
+  await pool.query(`CREATE TABLE IF NOT EXISTS app_data (
+    id         integer PRIMARY KEY,
+    data       jsonb NOT NULL,
+    updated_at timestamptz NOT NULL DEFAULT now()
+  )`);
+  const res = await pool.query("SELECT data FROM app_data WHERE id = 1");
+  if (res.rows.length) {
+    cache = res.rows[0].data;
+    console.log("🗄️  Postgres verbunden – vorhandene Daten geladen.");
+  } else {
+    cache = seed();
+    await pool.query("INSERT INTO app_data (id, data) VALUES (1, $1)", [JSON.stringify(cache)]);
+    console.log("🗄️  Postgres verbunden – Datenbank neu angelegt (Startdaten).");
+  }
+  return { backend: "postgres" };
+}
+
+function load() {
+  if (DATABASE_URL) {
+    if (!cache) throw new Error("Datenbank noch nicht bereit – bitte gleich erneut versuchen.");
+    /* Kopie zurückgeben, damit Änderungen erst mit save() wirken
+       (genau wie beim Lesen aus der JSON-Datei). */
+    return JSON.parse(JSON.stringify(cache));
+  }
+  return JSON.parse(fs.readFileSync(DB_PATH, "utf-8"));
+}
+
+function save(db) {
+  if (!DATABASE_URL) { fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2)); return; }
+  cache = JSON.parse(JSON.stringify(db));
+  const payload = JSON.stringify(cache);
+  const write = async () => {
+    let letzterFehler;
+    for (let versuch = 1; versuch <= 3; versuch++) {
+      try {
+        await pool.query(
+          `INSERT INTO app_data (id, data, updated_at) VALUES (1, $1, now())
+           ON CONFLICT (id) DO UPDATE SET data = EXCLUDED.data, updated_at = now()`,
+          [payload]);
+        return;
+      } catch (e) {
+        letzterFehler = e;
+        await new Promise(r => setTimeout(r, 250 * versuch));
+      }
+    }
+    console.error("❌ Daten konnten NICHT in die Datenbank geschrieben werden:", letzterFehler && letzterFehler.message);
+  };
+  /* Schreibvorgänge hintereinander ausführen, damit sie sich nicht überschreiben */
+  writeChain = writeChain.then(write, write);
+}
+
 function uid(prefix = "id") { return prefix + "_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
 /* ============ SEED-DATEN ============
    Frische Installation: nur der Entwickler-Account, alle Listen leer. */
+/* Feste ID für den Entwickler-Account.
+   Warum: Wird die Datenbank neu angelegt (z. B. weil der Speicher beim
+   Hosting flüchtig ist und nach einem Neustart/Deploy leer ist), bekam der
+   Account früher jedes Mal eine ZUFÄLLIGE neue ID. Alle ausgestellten
+   Sitzungen (JWT enthalten die Benutzer-ID) waren damit sofort ungültig –
+   man wurde ohne ersichtlichen Grund abgemeldet. Mit fester ID bleibt die
+   Sitzung auch nach einem Datenbank-Reset gültig. */
+const ROOT_USER_ID = "u_root";
+
 function seed() {
   const h = pw => bcrypt.hashSync(pw, 10);
   const today = new Date().toISOString().slice(0, 10);
   const users = [
-    { id: uid("u"), username: "Chris", passwordHash: h("mrpRHVO1"), discord: "@Chris", discordId: "",
+    { id: ROOT_USER_ID, username: "Chris", passwordHash: h("mrpRHVO1"), discord: "@Chris", discordId: "",
       role: "Entwickler", isDeveloper: true, active: true, tokenVersion: 1, createdAt: today },
   ];
   const settings = {
@@ -97,4 +188,16 @@ function seed() {
 
 ensureDb();
 
-module.exports = { load, save, uid, EBENEN, DEV_EBENE, ebeneOf, levelOf, allRolesOrdered, canEditRole, hasLevel };
+module.exports = {
+  init, load, save, uid, EBENEN, DEV_EBENE, ebeneOf, levelOf, allRolesOrdered, canEditRole, hasLevel,
+  ROOT_USER_ID, DATA_DIR, DB_PATH, DATABASE_URL,
+  /* "postgres" = dauerhaft, "json" = Datei (nur mit Disk dauerhaft) */
+  backend: DATABASE_URL ? "postgres" : "json",
+  /* true, wenn der Speicher ausdrücklich dauerhaft ist:
+     externe Datenbank (DATABASE_URL) oder Render-Disk (DATA_DIR).
+     false = flüchtiger Containerspeicher: Daten gehen bei Neustart/Deploy verloren. */
+  isPersistent: !!(process.env.DATABASE_URL || process.env.DATA_DIR),
+  /* Render setzt RENDER=true bzw. RENDER_SERVICE_ID – dann ist der lokale
+     Speicher ohne Disk grundsätzlich flüchtig. */
+  onRender: !!(process.env.RENDER || process.env.RENDER_SERVICE_ID),
+};

@@ -5,11 +5,29 @@ const jwt = require("jsonwebtoken");
 const DB = require("./db");
 
 const app = express();
+app.set("trust proxy", true);   // echte Besucher-IP hinter Proxys ermitteln
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"), {
+  setHeaders: (res, file) => {
+    if (file.endsWith(".html")) res.setHeader("Cache-Control", "no-store, must-revalidate");
+  },
+}));
 
 const JWT_SECRET = process.env.JWT_SECRET || "nrhh_super_secret_dev_key_change_me";
+if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") {
+  console.warn("⚠️  JWT_SECRET ist nicht gesetzt! Bitte in den Hosting-Einstellungen eine zufällige Zeichenkette hinterlegen.");
+}
 const PORT = process.env.PORT || 3000;
+
+/* ============ HEALTH-CHECK (für Render & Co.) ============ */
+app.get("/api/health", (req, res) => {
+  try {
+    const db = DB.load();
+    res.json({ ok: true, version: versionOf(db), users: db.users.length, uptime: Math.round(process.uptime()) });
+  } catch (e) {
+    res.status(500).json({ ok: false, error: "Datenbank nicht lesbar" });
+  }
+});
 
 /* ============ HELPERS ============ */
 function sanitizeUser(u) {
@@ -23,15 +41,61 @@ function log(db, user, action, target) {
     date: d.toLocaleDateString("de-DE"), time: d.toTimeString().slice(0, 5), ts: Date.now(),
   });
 }
+/* ============ IP-HILFEN ============ */
+function normIp(ip) {
+  if (!ip) return "unbekannt";
+  let v = String(ip).trim();
+  if (v.startsWith("::ffff:")) v = v.slice(7);      // IPv4-in-IPv6 -> reine IPv4
+  if (v === "::1") v = "127.0.0.1";
+  if (v === "::") v = "127.0.0.1";
+  return v;
+}
+function clientIp(req) {
+  const fwd = (req.headers["x-forwarded-for"] || "").split(",")[0].trim();
+  return normIp(fwd || req.ip || (req.socket && req.socket.remoteAddress) || "");
+}
+
+/* ============ VERSION ============ */
+const DEFAULT_VERSION = "v1.0";
+const versionOf = db => (db && db.settings && db.settings.version) || DEFAULT_VERSION;
+function bumpVersion(v) {
+  const m = /^v?(\d+)[.,](\d+)$/.exec(String(v || DEFAULT_VERSION).trim());
+  const major = m ? parseInt(m[1], 10) : 1;
+  const minor = (m ? parseInt(m[2], 10) : 0) + 1;
+  return "v" + major + "." + (minor < 10 ? "0" + minor : String(minor));
+}
+
 function notify(db, userId, message) {
   db.notifications.unshift({ id: DB.uid("n"), userId, message, date: new Date().toLocaleString("de-DE"), read: false });
 }
 
 /* ============ AUTH MIDDLEWARE ============ */
-function auth(req, res, next) {
+/* Token darf sowohl als Bearer-Header als auch als Cookie kommen.
+   So bleibt die Anmeldung auch dann gültig, wenn ein Proxy/Iframe Header schluckt. */
+function readCookie(req, name) {
+  const raw = req.headers.cookie || "";
+  const hit = raw.split(";").map(s => s.trim()).find(s => s.startsWith(name + "="));
+  return hit ? decodeURIComponent(hit.slice(name.length + 1)) : null;
+}
+function tokenFrom(req) {
   const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
-  if (!token) return res.status(401).json({ error: "Nicht angemeldet." });
+  if (header.startsWith("Bearer ")) return header.slice(7);
+  const q = req.query && req.query._t;          // Fallback 1: Token in der URL
+  if (q) return String(q);
+  return readCookie(req, "nh_token");           // Fallback 2: Cookie
+}
+function cookieOpts(req) {
+  const proto = (req.headers["x-forwarded-proto"] || "").split(",")[0].trim();
+  const secure = req.secure || proto === "https";
+  return { httpOnly: true, sameSite: secure ? "none" : "lax", path: "/", secure, maxAge: 12 * 60 * 60 * 1000 };
+}
+function auth(req, res, next) {
+  const token = tokenFrom(req);
+  if (!token) {
+    console.warn("[auth] 401 ohne Token:", req.method, req.originalUrl.split("?")[0],
+      "| cookie:", !!req.headers.cookie, "| query:", !!(req.query && req.query._t), "| ua:", (req.headers["user-agent"] || "-").slice(0, 40));
+    return res.status(401).json({ error: "Nicht angemeldet." });
+  }
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     const db = DB.load();
@@ -82,12 +146,22 @@ app.post("/api/auth/login", (req, res) => {
     return res.status(401).json({ error: "Benutzername oder Passwort falsch, oder Konto deaktiviert." });
   }
   const token = jwt.sign({ uid: user.id, tv: user.tokenVersion }, JWT_SECRET, { expiresIn: "12h" });
-  db.ipLogs.unshift({ id: DB.uid("ip"), userId: user.id, username: user.username, ip: req.ip, device: req.headers["user-agent"] || "Unbekannt", date: new Date().toLocaleString("de-DE") });
+  const rawIp = String(req.ip || (req.socket && req.socket.remoteAddress) || "");
+  db.ipLogs.unshift({
+    id: DB.uid("ip"), userId: user.id, username: user.username,
+    ip: clientIp(req), rawIp, note: "", ts: Date.now(),
+    device: req.headers["user-agent"] || "Unbekannt",
+    date: new Date().toLocaleString("de-DE"),
+  });
   log(db, user, "Login", "-");
   DB.save(db);
+  res.cookie("nh_token", token, cookieOpts(req));
+  res.cookie("nh_s", "1", { ...cookieOpts(req), httpOnly: false });
   res.json({ token, user: sanitizeUser(user) });
 });
 app.post("/api/auth/logout", auth, (req, res) => {
+  res.clearCookie("nh_token", { path: "/" });
+  res.clearCookie("nh_s", { path: "/" });
   const db = req.db;
   log(db, req.user, "Logout", "-");
   DB.save(db);
@@ -105,6 +179,7 @@ app.put("/api/auth/change-password", auth, (req, res) => {
   log(db, u, "Passwort geändert", "-");
   DB.save(db);
   const token = jwt.sign({ uid: u.id, tv: u.tokenVersion }, JWT_SECRET, { expiresIn: "12h" });
+  res.cookie("nh_token", token, cookieOpts(req));
   res.json({ ok: true, token });
 });
 
@@ -468,10 +543,50 @@ app.get("/api/logs", auth, requireLevel(5), (req, res) => {
 });
 
 /* ============ SICHERHEIT (Level >= 5) ============ */
-app.get("/api/security/sessions", auth, requireLevel(5), (req, res) => res.json({ sessions: req.db.ipLogs.slice(0, 100) }));
+app.get("/api/security/sessions", auth, requireLevel(5), (req, res) => {
+  const isDev = !!req.user.isDeveloper;
+  const sessions = [...req.db.ipLogs].sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 100)
+    .map(s => isDev ? s : { ...s, ip: "••••••• (nur Entwickler)", device: "ausgeblendet" });
+  res.json({ sessions, canSeeIp: isDev });
+});
 
 /* ============ IP-LOGGER (nur Entwickler) ============ */
-app.get("/api/ip-logs", auth, requireDev, (req, res) => res.json({ ipLogs: req.db.ipLogs }));
+app.get("/api/ip-logs", auth, requireDev, (req, res) => {
+  const list = [...req.db.ipLogs].sort((a, b) => (b.ts || 0) - (a.ts || 0));
+  res.json({ ipLogs: list, count: list.length });
+});
+app.put("/api/ip-logs/:id", auth, requireDev, (req, res) => {
+  const db = req.db;
+  const e = db.ipLogs.find(x => x.id === req.params.id);
+  if (!e) return res.status(404).json({ error: "Eintrag nicht gefunden." });
+  e.note = String(req.body.note || "").slice(0, 300);
+  log(db, req.user, "IP-Logger: Notiz bearbeitet", e.username + " / " + e.ip);
+  DB.save(db);
+  res.json({ ok: true, entry: e });
+});
+app.delete("/api/ip-logs/:id", auth, requireDev, (req, res) => {
+  const db = req.db;
+  const e = db.ipLogs.find(x => x.id === req.params.id);
+  if (!e) return res.status(404).json({ error: "Eintrag nicht gefunden." });
+  db.ipLogs = db.ipLogs.filter(x => x.id !== req.params.id);
+  log(db, req.user, "IP-Logger: Eintrag gelöscht", e.username + " / " + e.ip);
+  DB.save(db);
+  res.json({ ok: true });
+});
+app.delete("/api/ip-logs", auth, requireDev, (req, res) => {
+  const db = req.db;
+  const removed = db.ipLogs.length;
+  db.ipLogs = [];
+  log(db, req.user, "IP-Logger entleert", removed + " Einträge entfernt");
+  DB.save(db);
+  res.json({ ok: true, removed });
+});
+
+/* ============ VERSION (öffentlich – Login-Seite zeigt sie an) ============ */
+app.get("/api/version", (req, res) => {
+  const db = DB.load();
+  res.json({ version: versionOf(db), note: db.settings.versionNote || "", date: db.settings.versionDate || "" });
+});
 
 /* ============ SYSTEM-STATUS ============ */
 app.get("/api/system-status", auth, (req, res) => res.json({ status: req.db.settings.systemStatus, maintenance: req.db.settings.maintenance }));
@@ -487,6 +602,15 @@ app.put("/api/system-status", auth, requireLevel(5), (req, res) => {
 app.get("/api/settings", auth, requireLevel(5), (req, res) => res.json({ settings: req.db.settings }));
 app.put("/api/settings", auth, requireLevel(5), (req, res) => {
   const db = req.db;
+  if (req.body.version !== undefined) {
+    if (!req.user.isDeveloper) return res.status(403).json({ error: "Nur der Entwickler kann die Versionsnummer ändern." });
+    const v = String(req.body.version).trim();
+    if (!/^v?\d+[.,]\d+$/.test(v)) return res.status(400).json({ error: "Ungültige Version (Beispiel: v1.0 oder v1.01)." });
+    db.settings.version = v.startsWith("v") ? v : "v" + v;
+    log(db, req.user, "Versionsnummer gesetzt", db.settings.version);
+    DB.save(db);
+    return res.json({ ok: true, version: db.settings.version });
+  }
   db.settings.maintenance = !!req.body.maintenance;
   log(db, req.user, "Einstellungen geändert", "Wartungsmodus: " + (db.settings.maintenance ? "An" : "Aus"));
   DB.save(db);
@@ -501,10 +625,19 @@ app.get("/api/content/:type", auth, (req, res) => {
 app.post("/api/content/:type", auth, requireLevel(4), (req, res) => {
   const db = req.db;
   const item = { id: DB.uid("c"), type: req.params.type, title: req.body.title, body: req.body.body, pinned: !!req.body.pinned, author: req.user.username, date: new Date().toISOString().slice(0, 10) };
+  let newVersion = null;
+  if (req.params.type === "changelog") {
+    newVersion = bumpVersion(versionOf(db));
+    item.version = newVersion;
+    db.settings.version = newVersion;
+    db.settings.versionNote = item.title;
+    db.settings.versionDate = item.date;
+  }
   db.contents.unshift(item);
-  log(db, req.user, "Inhalt erstellt (" + req.params.type + ")", item.title);
+  log(db, req.user, req.params.type === "changelog" ? "Changelog veröffentlicht" : "Inhalt erstellt (" + req.params.type + ")",
+      item.title + (newVersion ? " (" + newVersion + ")" : ""));
   DB.save(db);
-  res.json({ item });
+  res.json({ item, version: db.settings.version });
 });
 app.delete("/api/content/:type/:id", auth, requireLevel(4), (req, res) => {
   const db = req.db;
@@ -579,4 +712,4 @@ app.put("/api/rank-info", auth, requireLevel(6), (req, res) => {
   res.json({ ok: true });
 });
 
-app.listen(PORT, () => console.log(`🚨 Notruf Hamburg Verwaltung läuft auf Port ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => console.log(`🚨 Notruf Hamburg Verwaltung läuft auf Port ${PORT}`));

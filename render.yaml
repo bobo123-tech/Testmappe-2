@@ -1,0 +1,34 @@
+# ============================================================
+#  Render.com – Blueprint für "Notruf Hamburg Verwaltungspanel"
+#  Diese Datei liegt im Wurzelverzeichnis des Repos.
+#  Render liest sie automatisch beim Anlegen eines Blueprints.
+# ============================================================
+services:
+  - type: web
+    name: notruf-hamburg
+    runtime: node
+    plan: free
+    region: frankfurt
+    branch: main
+    rootDir: notruf-hamburg
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      # Render erzeugt automatisch einen zufälligen Schlüssel für die Anmeldung
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_VERSION
+        value: "22.11.0"
+      # Für dauerhafte Speicherung: unten bei "Disk" die Kommentare entfernen
+      # und diese Zeile aktivieren (siehe ANLEITUNG-RENDER.md, Schritt 9):
+      # - key: DATA_DIR
+      #   value: /var/data
+    # Optional: dauerhafte Festplatte (nur mit Starter-Plan, ca. 7 $/Monat).
+    # Ohne Disk werden Änderungen (Benutzer, Warns, Bans ...) bei jedem
+    # Deploy / Neustart auf den Ausgangszustand zurückgesetzt.
+    # disk:
+    #   name: notruf-hamburg-data
+    #   mountPath: /var/data
+    #   sizeGB: 1

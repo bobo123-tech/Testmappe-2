@@ -19,11 +19,33 @@ if (!process.env.JWT_SECRET && process.env.NODE_ENV === "production") {
 }
 const PORT = process.env.PORT || 3000;
 
+/* ============ SCHICHT-REGELN (zentral – hier ändern, UI zieht nach) ============
+   - Schicht-Timer zählt ab Start hoch (angezeigte Schichtdauer).
+   - Alle CHECK_INTERVAL_MIN Minuten muss die Anwesenheit bestätigt werden.
+   - Ohne Bestätigung endet die Schicht automatisch (Status "auto_ended").
+   - Nach dem Ende gilt COOLDOWN_MIN Minuten Pause, bevor eine neue Schicht
+     gestartet werden darf. */
+const CHECK_INTERVAL_MIN = Number(process.env.SHIFT_CHECK_MIN) || 60;
+const COOLDOWN_MIN = Number(process.env.SHIFT_COOLDOWN_MIN) || 10;
+
 /* ============ HEALTH-CHECK (für Render & Co.) ============ */
 app.get("/api/health", (req, res) => {
   try {
     const db = DB.load();
-    res.json({ ok: true, version: versionOf(db), users: db.users.length, uptime: Math.round(process.uptime()) });
+    res.json({
+      ok: true, version: versionOf(db), users: db.users.length, uptime: Math.round(process.uptime()),
+      /* Diagnose Speicher: Ohne DATA_DIR liegt die Datenbank im flüchtigen
+         Containerspeicher und ist nach jedem Neustart/Deploy wieder leer. */
+      storage: {
+        backend: DB.backend,
+        persistent: DB.isPersistent,
+        onRender: DB.onRender,
+        dataDir: DB.backend === "json" ? DB.DATA_DIR : null,
+        envVar: process.env.DATA_DIR || null,
+        /* gefährlich = läuft auf Render OHNE dauerhaften Speicher */
+        atRisk: DB.onRender && !DB.isPersistent,
+      },
+    });
   } catch (e) {
     res.status(500).json({ ok: false, error: "Datenbank nicht lesbar" });
   }
@@ -127,15 +149,15 @@ function sweepShifts(db) {
     if (s.status === "active" && now > new Date(s.nextDeadline).getTime()) {
       s.status = "auto_ended";
       s.endTime = s.nextDeadline;
-      s.cooldownUntil = new Date(new Date(s.nextDeadline).getTime() + 10 * 60000).toISOString();
-      log(db, { username: s.username, role: s.role }, "Schicht automatisch beendet (Inaktivität)", s.username);
-      notify(db, s.userId, "⏱️ Deine Schicht wurde automatisch beendet, da du nicht rechtzeitig bestätigt hast.");
+      s.cooldownUntil = new Date(new Date(s.nextDeadline).getTime() + COOLDOWN_MIN * 60000).toISOString();
+      log(db, { username: s.username, role: s.role }, "Schicht automatisch beendet (keine Bestätigung)", s.username);
+      notify(db, s.userId, `⏱️ Deine Schicht wurde automatisch beendet, weil du ${CHECK_INTERVAL_MIN} Minuten nicht bestätigt hast.`);
       changed = true;
     }
   });
   if (changed) DB.save(db);
 }
-setInterval(() => sweepShifts(DB.load()), 20000);
+setInterval(() => { try { sweepShifts(DB.load()); } catch { /* Speicher noch nicht bereit */ } }, 20000);
 
 /* ============ AUTH ROUTES ============ */
 app.post("/api/auth/login", (req, res) => {
@@ -436,8 +458,6 @@ app.get("/api/dashboard-stats", auth, (req, res) => {
 });
 
 /* ============ SCHICHT-SYSTEM ============ */
-const CHECK_INTERVAL_MIN = 60;
-const COOLDOWN_MIN = 10;
 
 app.get("/api/shifts/mine", auth, (req, res) => {
   sweepShifts(req.db);
@@ -449,7 +469,15 @@ app.get("/api/shifts/mine", auth, (req, res) => {
   if (!active && last && last.cooldownUntil) {
     cooldownRemaining = Math.max(0, new Date(last.cooldownUntil).getTime() - Date.now());
   }
-  res.json({ active: active || null, cooldownRemaining, history: mine.slice(0, 10) });
+  res.json({
+    active: active || null,
+    cooldownRemaining,
+    history: mine.slice(0, 10),
+    // Regeln für die Oberfläche (Timer zählt hoch, Bestätigung alle X Minuten, Y Minuten Pause danach)
+    checkIntervalMin: CHECK_INTERVAL_MIN,
+    cooldownMin: COOLDOWN_MIN,
+    now: Date.now(),
+  });
 });
 app.post("/api/shifts/start", auth, (req, res) => {
   const db = req.db;
@@ -458,7 +486,9 @@ app.post("/api/shifts/start", auth, (req, res) => {
   if (mine.some(s => s.status === "active")) return res.status(400).json({ error: "Du hast bereits eine aktive Schicht." });
   const last = mine[0];
   if (last && last.cooldownUntil && new Date(last.cooldownUntil) > new Date()) {
-    return res.status(400).json({ error: "Cooldown aktiv. Bitte warte, bevor du eine neue Schicht startest.", cooldownRemaining: new Date(last.cooldownUntil).getTime() - Date.now() });
+    const rem = new Date(last.cooldownUntil).getTime() - Date.now();
+    const mm = Math.max(1, Math.ceil(rem / 60000));
+    return res.status(400).json({ error: `Cooldown aktiv. Du kannst in ${mm} Minute${mm === 1 ? "" : "n"} wieder eine Schicht starten.`, cooldownRemaining: rem });
   }
   const now = new Date();
   const next = new Date(now.getTime() + CHECK_INTERVAL_MIN * 60000);
@@ -466,7 +496,7 @@ app.post("/api/shifts/start", auth, (req, res) => {
   db.shifts.unshift(shift);
   log(db, req.user, "Schicht gestartet", "-");
   DB.save(db);
-  res.json({ shift });
+  res.json({ shift, checkIntervalMin: CHECK_INTERVAL_MIN, cooldownMin: COOLDOWN_MIN });
 });
 app.post("/api/shifts/confirm", auth, (req, res) => {
   const db = req.db;
@@ -480,7 +510,7 @@ app.post("/api/shifts/confirm", auth, (req, res) => {
   shift.confirmCount++;
   log(dbFresh, req.user, "Schicht-Check bestätigt", "-");
   DB.save(dbFresh);
-  res.json({ shift });
+  res.json({ shift, checkIntervalMin: CHECK_INTERVAL_MIN, cooldownMin: COOLDOWN_MIN });
 });
 app.post("/api/shifts/end", auth, (req, res) => {
   const db = req.db;
@@ -712,4 +742,15 @@ app.put("/api/rank-info", auth, requireLevel(6), (req, res) => {
   res.json({ ok: true });
 });
 
-app.listen(PORT, "0.0.0.0", () => console.log(`🚨 Notruf Hamburg Verwaltung läuft auf Port ${PORT}`));
+/* Der Speicher kann asynchron bereitgestellt werden (Postgres). Der Server
+   geht erst ans Netz, wenn die Daten verfügbar sind. */
+DB.init()
+  .then(info => {
+    app.listen(PORT, "0.0.0.0", () =>
+      console.log(`🚨 Notruf Hamburg Verwaltung läuft auf Port ${PORT} · Speicher: ${info.backend}`));
+  })
+  .catch(e => {
+    console.error("❌ Datenbank konnte nicht gestartet werden:", e && e.message);
+    console.error("   Bitte DATABASE_URL prüfen (erreichbar? sslmode=require gesetzt?).");
+    process.exit(1);
+  });

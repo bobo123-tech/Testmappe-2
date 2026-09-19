@@ -451,10 +451,16 @@ const tk=()=>{try{return localStorage.getItem('nh_t')||MEM_T;}catch{return MEM_T
 const setT=v=>{MEM_T=v;try{localStorage.setItem('nh_t',v);}catch{}};
 const delT=()=>{MEM_T=null;try{localStorage.removeItem('nh_t');}catch{}};
 let SESSION_ENDED=false;
+const hasSess=()=>{let c=false;try{c=document.cookie.includes('nh_s=');}catch{} return !!tk()||c;};
 async function api(p,o={}){
   const h={'Content-Type':'application/json',...(o.headers||{})};
-  if(tk())h.Authorization='Bearer '+tk();
-  const r=await fetch(A+p,{...o,headers:h});
+  const t=tk();
+  let url=A+p;
+  if(t){
+    h.Authorization='Bearer '+t;                       /* Transport 1: Header  */
+    url+=(p.includes('?')?'&':'?')+'_t='+encodeURIComponent(t); /* Transport 2: URL */
+  }
+  const r=await fetch(url,{...o,headers:h,cache:'no-store'});
   let d={};try{d=await r.json();}catch{}
   if(r.status===401){
     const hadSession=!!tk()||!!ME;
@@ -509,7 +515,7 @@ async function doLogin(e){e.preventDefault();
  }catch(x){lerr.innerHTML=`<div class="lg-err">${svg('warn')}<span>${esc(x.message)}</span></div>`;}
  return false;}
 async function doLogout(){try{await api('/auth/logout',{method:'POST'});}catch{} delT();ME=null;SESSION_ENDED=false;location.hash='';rt();}
-async function me(){if(ME)return ME;try{ME=(await api('/auth/me')).user;return ME;}catch{return null;}}
+async function me(){if(ME)return ME;if(!hasSess())return null;try{ME=(await api('/auth/me')).user;return ME;}catch{return null;}}
 
 /* ============ NAV ============ */
 const NAV=[
@@ -567,7 +573,7 @@ async function rt(){
  const u=await me();
  if(!u){
    login.classList.remove('hidden');app.classList.add('hidden');
-   if(SESSION_ENDED){lerr.innerHTML=`<div class="lg-err">${svg('warn')}<span>Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.</span></div>`;SESSION_ENDED=false;}
+   if(SESSION_ENDED){lerr.innerHTML=`<div class="lg-err">${svg('warn')}<span>Sitzung abgelaufen – bitte lade die Seite einmal neu (Strg+F5) und melde dich erneut an.</span></div>`;SESSION_ENDED=false;}
    return;}
  login.classList.add('hidden');app.classList.remove('hidden');
  const[p,arg]=(location.hash.slice(1)||'dashboard').split('/');

@@ -42,7 +42,9 @@ function readCookie(req, name) {
 function tokenFrom(req) {
   const header = req.headers.authorization || "";
   if (header.startsWith("Bearer ")) return header.slice(7);
-  return readCookie(req, "nh_token");
+  const q = req.query && req.query._t;          // Fallback 1: Token in der URL
+  if (q) return String(q);
+  return readCookie(req, "nh_token");           // Fallback 2: Cookie
 }
 function cookieOpts(req) {
   const proto = (req.headers["x-forwarded-proto"] || "").split(",")[0].trim();
@@ -52,7 +54,8 @@ function cookieOpts(req) {
 function auth(req, res, next) {
   const token = tokenFrom(req);
   if (!token) {
-    console.warn("[auth] 401 ohne Token:", req.method, req.originalUrl, "| cookie:", !!req.headers.cookie, "| org:", req.headers.origin || "-");
+    console.warn("[auth] 401 ohne Token:", req.method, req.originalUrl.split("?")[0],
+      "| cookie:", !!req.headers.cookie, "| query:", !!(req.query && req.query._t), "| ua:", (req.headers["user-agent"] || "-").slice(0, 40));
     return res.status(401).json({ error: "Nicht angemeldet." });
   }
   try {
@@ -109,10 +112,12 @@ app.post("/api/auth/login", (req, res) => {
   log(db, user, "Login", "-");
   DB.save(db);
   res.cookie("nh_token", token, cookieOpts(req));
+  res.cookie("nh_s", "1", { ...cookieOpts(req), httpOnly: false });
   res.json({ token, user: sanitizeUser(user) });
 });
 app.post("/api/auth/logout", auth, (req, res) => {
   res.clearCookie("nh_token", { path: "/" });
+  res.clearCookie("nh_s", { path: "/" });
   const db = req.db;
   log(db, req.user, "Logout", "-");
   DB.save(db);

@@ -6,7 +6,11 @@ const DB = require("./db");
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "public"), {
+  setHeaders: (res, file) => {
+    if (file.endsWith(".html")) res.setHeader("Cache-Control", "no-store, must-revalidate");
+  },
+}));
 
 const JWT_SECRET = process.env.JWT_SECRET || "nrhh_super_secret_dev_key_change_me";
 const PORT = process.env.PORT || 3000;
@@ -28,10 +32,29 @@ function notify(db, userId, message) {
 }
 
 /* ============ AUTH MIDDLEWARE ============ */
-function auth(req, res, next) {
+/* Token darf sowohl als Bearer-Header als auch als Cookie kommen.
+   So bleibt die Anmeldung auch dann gültig, wenn ein Proxy/Iframe Header schluckt. */
+function readCookie(req, name) {
+  const raw = req.headers.cookie || "";
+  const hit = raw.split(";").map(s => s.trim()).find(s => s.startsWith(name + "="));
+  return hit ? decodeURIComponent(hit.slice(name.length + 1)) : null;
+}
+function tokenFrom(req) {
   const header = req.headers.authorization || "";
-  const token = header.startsWith("Bearer ") ? header.slice(7) : null;
-  if (!token) return res.status(401).json({ error: "Nicht angemeldet." });
+  if (header.startsWith("Bearer ")) return header.slice(7);
+  return readCookie(req, "nh_token");
+}
+function cookieOpts(req) {
+  const proto = (req.headers["x-forwarded-proto"] || "").split(",")[0].trim();
+  const secure = req.secure || proto === "https";
+  return { httpOnly: true, sameSite: secure ? "none" : "lax", path: "/", secure, maxAge: 12 * 60 * 60 * 1000 };
+}
+function auth(req, res, next) {
+  const token = tokenFrom(req);
+  if (!token) {
+    console.warn("[auth] 401 ohne Token:", req.method, req.originalUrl, "| cookie:", !!req.headers.cookie, "| org:", req.headers.origin || "-");
+    return res.status(401).json({ error: "Nicht angemeldet." });
+  }
   try {
     const payload = jwt.verify(token, JWT_SECRET);
     const db = DB.load();
@@ -85,9 +108,11 @@ app.post("/api/auth/login", (req, res) => {
   db.ipLogs.unshift({ id: DB.uid("ip"), userId: user.id, username: user.username, ip: req.ip, device: req.headers["user-agent"] || "Unbekannt", date: new Date().toLocaleString("de-DE") });
   log(db, user, "Login", "-");
   DB.save(db);
+  res.cookie("nh_token", token, cookieOpts(req));
   res.json({ token, user: sanitizeUser(user) });
 });
 app.post("/api/auth/logout", auth, (req, res) => {
+  res.clearCookie("nh_token", { path: "/" });
   const db = req.db;
   log(db, req.user, "Logout", "-");
   DB.save(db);
@@ -105,6 +130,7 @@ app.put("/api/auth/change-password", auth, (req, res) => {
   log(db, u, "Passwort geändert", "-");
   DB.save(db);
   const token = jwt.sign({ uid: u.id, tv: u.tokenVersion }, JWT_SECRET, { expiresIn: "12h" });
+  res.cookie("nh_token", token, cookieOpts(req));
   res.json({ ok: true, token });
 });
 

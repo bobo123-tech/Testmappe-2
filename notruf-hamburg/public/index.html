@@ -446,13 +446,22 @@ const roleOpts=(u,c)=>ORDER.filter(r=>u.isDeveloper||rankNr(r)>rankNr(u.role)).m
 
 /* ============ API ============ */
 const A='/api';
-const tk=()=>localStorage.getItem('nh_t');
+let MEM_T=null;
+const tk=()=>{try{return localStorage.getItem('nh_t')||MEM_T;}catch{return MEM_T;}};
+const setT=v=>{MEM_T=v;try{localStorage.setItem('nh_t',v);}catch{}};
+const delT=()=>{MEM_T=null;try{localStorage.removeItem('nh_t');}catch{}};
+let SESSION_ENDED=false;
 async function api(p,o={}){
   const h={'Content-Type':'application/json',...(o.headers||{})};
   if(tk())h.Authorization='Bearer '+tk();
   const r=await fetch(A+p,{...o,headers:h});
   let d={};try{d=await r.json();}catch{}
-  if(r.status===401){localStorage.removeItem('nh_t');ME=null;location.hash='';rt();throw new Error(d.error||'Session abgelaufen');}
+  if(r.status===401){
+    const hadSession=!!tk()||!!ME;
+    delT();ME=null;
+    if(hadSession){SESSION_ENDED=true;location.hash='';rt();}
+    throw new Error(d.error||'Sitzung abgelaufen');
+  }
   if(!r.ok)throw new Error(d.error||'Fehler');
   return d;
 }
@@ -496,11 +505,11 @@ document.addEventListener('click',e=>{const b=e.target.closest('.btn');if(!b)ret
 /* ============ AUTH ============ */
 async function doLogin(e){e.preventDefault();
  try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({username:lu.value,password:lp.value})});
-  localStorage.setItem('nh_t',d.token);ME=d.user;lerr.innerHTML='';location.hash='dashboard';rt();
+  setT(d.token);SESSION_ENDED=false;ME=d.user;lerr.innerHTML='';location.hash='dashboard';rt();
  }catch(x){lerr.innerHTML=`<div class="lg-err">${svg('warn')}<span>${esc(x.message)}</span></div>`;}
  return false;}
-async function doLogout(){try{await api('/auth/logout',{method:'POST'});}catch{} localStorage.removeItem('nh_t');ME=null;location.hash='';rt();}
-async function me(){if(!tk())return null;if(ME)return ME;try{ME=(await api('/auth/me')).user;return ME;}catch{return null;}}
+async function doLogout(){try{await api('/auth/logout',{method:'POST'});}catch{} delT();ME=null;SESSION_ENDED=false;location.hash='';rt();}
+async function me(){if(ME)return ME;try{ME=(await api('/auth/me')).user;return ME;}catch{return null;}}
 
 /* ============ NAV ============ */
 const NAV=[
@@ -556,7 +565,10 @@ function gsGo(){S.f.pq=gs.value;go('team');}
 const PG={};
 async function rt(){
  const u=await me();
- if(!u){login.classList.remove('hidden');app.classList.add('hidden');return;}
+ if(!u){
+   login.classList.remove('hidden');app.classList.add('hidden');
+   if(SESSION_ENDED){lerr.innerHTML=`<div class="lg-err">${svg('warn')}<span>Deine Sitzung ist abgelaufen. Bitte melde dich erneut an.</span></div>`;SESSION_ENDED=false;}
+   return;}
  login.classList.add('hidden');app.classList.remove('hidden');
  const[p,arg]=(location.hash.slice(1)||'dashboard').split('/');
  const item=NAV.find(x=>x.p===p);
@@ -997,7 +1009,7 @@ PG.pw=async()=>{ct.innerHTML=ph('key','Passwort ändern','Aktualisiere dein pers
  <button class="btn b-g b-full">${svg('key')} Passwort ändern</button></form></div>`;};
 async function chPw(e){e.preventDefault();if(p2.value!==p3.value){toast('Passwörter stimmen nicht überein','e');return false;}
  try{const d=await api('/auth/change-password',{method:'PUT',body:JSON.stringify({oldPassword:p1.value,newPassword:p2.value})});
- localStorage.setItem('nh_t',d.token);toast('Passwort erfolgreich geändert');e.target.reset();}catch(x){toast(x.message,'e');}return false;}
+ setT(d.token);toast('Passwort erfolgreich geändert');e.target.reset();}catch(x){toast(x.message,'e');}return false;}
 
 PG.settings=async u=>{const d=await api('/settings');
  ct.innerHTML=ph('cog','Einstellungen','Konto- & Systeminformationen')+`

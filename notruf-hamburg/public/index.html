@@ -15,6 +15,8 @@
   --r:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
+/* ---------- ICONS (default size – verhindert riesige Symbole) ---------- */
+svg{width:16px;height:16px;flex-shrink:0;vertical-align:-2px;}
 html,body{height:100%;}
 body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--tx);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
 .hidden{display:none!important;}
@@ -42,26 +44,26 @@ body{font-family:'Inter','Segoe UI',system-ui,sans-serif;background:var(--bg);co
   url('https://images.unsplash.com/photo-1601987177651-8edfe6c20009?q=80&w=1800&auto=format&fit=crop') center/cover;}
 .lg-left::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 60%,var(--bg2));}
 .lg-brand{position:relative;z-index:3;animation:up .8s cubic-bezier(.2,.8,.2,1);}
-.lg-siren{width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px;
-  background:linear-gradient(135deg,rgba(34,197,94,.22),rgba(34,197,94,.06));border:1px solid rgba(34,197,94,.4);
-  box-shadow:0 0 34px var(--glow);animation:pulse 2.6s ease-in-out infinite;}
-@keyframes pulse{0%,100%{box-shadow:0 0 28px rgba(34,197,94,.3);}50%{box-shadow:0 0 52px rgba(34,197,94,.6);}}
+.lg-siren{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;
+  background:linear-gradient(135deg,rgba(34,197,94,.18),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.26);
+  animation:pulse 3.6s ease-in-out infinite;}
+.lg-siren svg{width:21px;height:21px;color:var(--g3);}
+@keyframes pulse{0%,100%{box-shadow:0 4px 16px rgba(34,197,94,.14);}50%{box-shadow:0 6px 26px rgba(34,197,94,.3);}}
 .lg-brand h1{font-size:42px;font-weight:900;letter-spacing:-1.4px;line-height:1;}
 .lg-brand h1 span{background:linear-gradient(135deg,var(--g3),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
 .lg-brand p{color:#b6c0d0;font-size:14.5px;max-width:440px;margin-top:14px;line-height:1.65;}
 .lg-tags{display:flex;gap:9px;margin-top:22px;flex-wrap:wrap;}
-.lg-tag{padding:6px 13px;border-radius:30px;background:rgba(255,255,255,.06);border:1px solid var(--line2);font-size:11.5px;font-weight:600;backdrop-filter:blur(10px);}
+.lg-tag{padding:6px 13px;border-radius:30px;display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.06);border:1px solid var(--line2);font-size:11.5px;font-weight:600;backdrop-filter:blur(10px);}
 .lg-right{flex:.85;min-width:440px;background:var(--bg2);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;position:relative;}
-.mrp{width:300px;height:158px;border-radius:18px;display:flex;align-items:center;justify-content:center;margin-bottom:34px;position:relative;overflow:hidden;
-  background:radial-gradient(circle at 50% 65%,rgba(34,197,94,.4),rgba(0,0,0,.95) 72%);border:1px solid rgba(34,197,94,.35);
-  box-shadow:0 0 70px rgba(34,197,94,.22),inset 0 0 40px rgba(34,197,94,.08);animation:up .7s ease both;}
-.mrp::before{content:"";position:absolute;inset:-50%;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.14) 50%,transparent 58%);animation:sweep 4.5s ease-in-out infinite;}
-@keyframes sweep{0%{transform:translateX(-60%);}60%,100%{transform:translateX(60%);}}
+.lg-mark{display:flex;align-items:center;gap:9px;margin-bottom:12px;font-size:10px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim2);}
+.lg-mark b{font-size:15px;font-weight:900;letter-spacing:.3px;background:linear-gradient(135deg,var(--g3),var(--g));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.lg-mark i{width:6px;height:6px;border-radius:50%;background:var(--g);box-shadow:0 0 10px var(--glow);flex-shrink:0;}
 .lg-form{width:360px;max-width:90vw;animation:up .7s .1s ease both;}
 .lg-form h2{font-size:25px;font-weight:800;letter-spacing:-.6px;}
 .lg-form .s{color:var(--dim);font-size:13px;margin:5px 0 24px;}
-.lg-err{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#ff9b8f;padding:11px 14px;border-radius:11px;font-size:12.5px;margin-bottom:16px;animation:shake .4s;}
+.lg-err{display:flex;align-items:center;gap:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.35);color:#ff9b8f;padding:11px 14px;border-radius:11px;font-size:12.5px;margin-bottom:16px;animation:shake .4s;}
 @keyframes shake{0%,100%{transform:translateX(0);}25%{transform:translateX(-7px);}75%{transform:translateX(7px);}}
+.lg-err svg{width:15px;height:15px;flex-shrink:0;}
 .lg-foot{margin-top:28px;font-size:11px;color:var(--dim2);text-align:center;}
 .lg-foot b{color:var(--g);}
 .demo{margin-top:18px;padding:13px 15px;border-radius:12px;background:rgba(255,255,255,.025);border:1px dashed var(--line2);font-size:10.5px;color:var(--dim);line-height:1.85;}
@@ -78,13 +80,14 @@ textarea.inp{resize:vertical;min-height:84px;line-height:1.6;}
 select.inp{cursor:pointer;}
 .r2{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
 .r3{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;}
-.btn{position:relative;overflow:hidden;border:none;padding:11px 18px;border-radius:11px;cursor:pointer;font-weight:700;font-size:13px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:.2s;font-family:inherit;}
+.btn{position:relative;overflow:hidden;border:none;padding:10px 16px;border-radius:10px;cursor:pointer;font-weight:700;font-size:12.5px;letter-spacing:.1px;display:inline-flex;align-items:center;justify-content:center;gap:7px;transition:.2s;font-family:inherit;}
+.btn svg{width:14.5px;height:14.5px;}
 .btn:active{transform:scale(.965);}
 .btn::after{content:"";position:absolute;width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.55);opacity:0;transform:scale(1);}
 .btn.rip::after{animation:rip .6s ease-out;}
 @keyframes rip{0%{opacity:.6;transform:scale(1);}100%{opacity:0;transform:scale(42);}}
-.b-g{background:linear-gradient(135deg,var(--g),var(--g2));color:#04240f;box-shadow:0 7px 22px rgba(34,197,94,.3);}
-.b-g:hover{box-shadow:0 10px 30px rgba(34,197,94,.45);transform:translateY(-1.5px);}
+.b-g{background:linear-gradient(135deg,var(--g),var(--g2));color:#04240f;box-shadow:0 5px 16px rgba(34,197,94,.24);}
+.b-g:hover{box-shadow:0 8px 22px rgba(34,197,94,.38);transform:translateY(-1px);}
 .b-gh{background:rgba(34,197,94,.1);color:var(--g3);border:1px solid rgba(34,197,94,.3);}
 .b-gh:hover{background:rgba(34,197,94,.18);}
 .b-x{background:rgba(255,255,255,.05);color:var(--tx);border:1px solid var(--line2);}
@@ -92,16 +95,18 @@ select.inp{cursor:pointer;}
 .b-r{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff;box-shadow:0 6px 18px rgba(239,68,68,.25);}
 .b-r:hover{filter:brightness(1.1);}
 .b-full{width:100%;}
-.b-s{padding:7px 11px;font-size:11.5px;border-radius:9px;}
-.icb{width:32px;height:32px;border-radius:9px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:var(--dim);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.2s;font-size:13px;}
-.icb:hover{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.4);color:var(--g3);transform:translateY(-2px);}
+.b-s{padding:6.5px 10px;font-size:11.5px;border-radius:8px;}
+.icb{width:29px;height:29px;border-radius:9px;border:1px solid var(--line2);background:rgba(255,255,255,.03);color:var(--dim);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:.2s;}
+.icb svg{width:14px;height:14px;}
+.icb:hover{background:rgba(34,197,94,.14);border-color:rgba(34,197,94,.4);color:var(--g3);transform:translateY(-1px);}
 .icb.dz:hover{background:rgba(239,68,68,.14);border-color:rgba(239,68,68,.4);color:#ff8d80;}
 
 /* ---------- APP ---------- */
 #app{position:relative;z-index:2;display:flex;min-height:100vh;}
 #sb{width:258px;min-width:258px;background:linear-gradient(180deg,rgba(11,15,22,.96),rgba(5,7,10,.98));border-right:1px solid var(--line);display:flex;flex-direction:column;position:sticky;top:0;height:100vh;z-index:60;backdrop-filter:blur(20px);}
 .sb-h{padding:19px 18px;border-bottom:1px solid var(--line);display:flex;gap:11px;align-items:center;}
-.sb-logo{width:38px;height:38px;border-radius:11px;background:linear-gradient(135deg,rgba(34,197,94,.25),rgba(34,197,94,.07));border:1px solid rgba(34,197,94,.4);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 18px rgba(34,197,94,.25);}
+.sb-logo{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.05));border:1px solid rgba(34,197,94,.26);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 14px rgba(34,197,94,.14);}
+.sb-logo svg{width:18px;height:18px;color:var(--g3);}
 .sb-h h1{font-size:13.5px;font-weight:800;letter-spacing:-.2px;}
 .sb-h span{font-size:9px;color:var(--dim2);letter-spacing:1.3px;font-weight:700;}
 .nav{flex:1;padding:12px 9px;overflow-y:auto;position:relative;}
@@ -110,13 +115,13 @@ select.inp{cursor:pointer;}
 .ni:hover{background:rgba(255,255,255,.045);color:var(--tx);padding-left:15px;}
 .ni.on{background:linear-gradient(90deg,rgba(34,197,94,.17),rgba(34,197,94,.02));color:#fff;}
 .ni.on::before{content:"";position:absolute;left:-9px;top:50%;transform:translateY(-50%);width:3px;height:19px;background:var(--g);border-radius:0 3px 3px 0;box-shadow:0 0 12px var(--g);}
-.ni svg{width:16px;height:16px;flex-shrink:0;}
+.ni svg{width:15px;height:15px;flex-shrink:0;}
 .ni.on svg{color:var(--g3);}
 .sb-f{padding:11px;border-top:1px solid var(--line);}
 #main{flex:1;display:flex;flex-direction:column;min-width:0;}
 #top{height:60px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 22px;background:rgba(5,7,10,.72);backdrop-filter:blur(18px);position:sticky;top:0;z-index:50;gap:16px;}
 .srch{position:relative;flex:1;max-width:400px;}
-.srch svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:15px;height:15px;color:var(--dim2);}
+.srch svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--dim2);}
 .srch .inp{padding-left:35px;height:38px;border-radius:10px;font-size:12.5px;}
 .mb{display:none;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;}
 .pchip{display:flex;align-items:center;gap:9px;padding:5px 12px 5px 5px;border-radius:30px;background:rgba(255,255,255,.04);border:1px solid var(--line2);cursor:pointer;transition:.2s;}
@@ -136,8 +141,8 @@ select.inp{cursor:pointer;}
 .cpad{padding:20px;}
 .ph{display:flex;align-items:flex-start;gap:14px;margin-bottom:22px;flex-wrap:wrap;justify-content:space-between;}
 .ph-l{display:flex;gap:14px;align-items:center;}
-.ph-ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,rgba(34,197,94,.2),rgba(34,197,94,.05));border:1px solid rgba(34,197,94,.3);display:flex;align-items:center;justify-content:center;color:var(--g3);box-shadow:0 0 18px rgba(34,197,94,.14);}
-.ph-ic svg{width:20px;height:20px;}
+.ph-ic{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,rgba(34,197,94,.16),rgba(34,197,94,.04));border:1px solid rgba(34,197,94,.2);display:flex;align-items:center;justify-content:center;color:var(--g3);box-shadow:0 3px 12px rgba(34,197,94,.1);}
+.ph-ic svg{width:16px;height:16px;}
 .ph h2{font-size:26px;font-weight:900;letter-spacing:-.9px;line-height:1.1;}
 .ph p{font-size:12.5px;color:var(--dim);margin-top:3px;}
 .sl{font-size:10px;font-weight:800;letter-spacing:1.4px;color:var(--g);margin:26px 0 13px;text-transform:uppercase;display:flex;align-items:center;gap:10px;}
@@ -150,8 +155,8 @@ select.inp{cursor:pointer;}
 
 /* tiles */
 .tile{padding:17px;display:flex;gap:13px;align-items:center;cursor:pointer;}
-.t-ic{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--g),var(--cya));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 5px 16px rgba(34,197,94,.24);transition:.25s;}
-.t-ic svg{width:19px;height:19px;color:#04240f;}
+.t-ic{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--g),var(--cya));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(34,197,94,.18);transition:.25s;}
+.t-ic svg{width:16px;height:16px;color:#04240f;}
 .tile:hover .t-ic{transform:scale(1.08) rotate(-4deg);}
 .tile h4{font-size:13.8px;font-weight:700;}
 .tile p{font-size:11px;color:var(--dim);margin-top:2px;}
@@ -160,8 +165,8 @@ select.inp{cursor:pointer;}
 .st{padding:17px 18px;position:relative;overflow:hidden;}
 .st-t{font-size:10px;font-weight:800;letter-spacing:1.1px;color:var(--dim);text-transform:uppercase;}
 .st-v{font-size:29px;font-weight:900;margin-top:7px;letter-spacing:-1.2px;font-variant-numeric:tabular-nums;}
-.st-ic{position:absolute;top:15px;right:15px;width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;transition:.3s;}
-.st-ic svg{width:19px;height:19px;}
+.st-ic{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;transition:.3s;}
+.st-ic svg{width:17px;height:17px;}
 .st:hover .st-ic{transform:scale(1.12) rotate(6deg);}
 .st-bar{position:absolute;bottom:0;left:0;height:2.5px;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1);}
 .i-g{background:rgba(34,197,94,.15);color:var(--g3);} .b-ig{background:linear-gradient(90deg,var(--g),transparent);}
@@ -204,7 +209,7 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 /* empty / skeleton */
 .emp{text-align:center;padding:52px 20px;color:var(--dim2);}
 .emp-ic{width:62px;height:62px;border-radius:17px;background:rgba(255,255,255,.035);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin:0 auto 15px;}
-.emp-ic svg{width:26px;height:26px;color:var(--dim2);}
+.emp-ic svg{width:24px;height:24px;color:var(--dim2);}
 .emp p{font-size:12.8px;}
 .sk{background:linear-gradient(90deg,rgba(255,255,255,.035) 25%,rgba(255,255,255,.08) 50%,rgba(255,255,255,.035) 75%);background-size:200% 100%;animation:shim 1.4s infinite;border-radius:9px;}
 @keyframes shim{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
@@ -215,7 +220,8 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 @keyframes fIn{from{opacity:0;}to{opacity:1;}}
 .mbx{width:470px;max-width:100%;max-height:86vh;overflow-y:auto;padding:24px;background:var(--panel2);border:1px solid var(--line2);border-radius:18px;box-shadow:0 26px 70px rgba(0,0,0,.65);animation:mIn .3s cubic-bezier(.2,.8,.2,1);}
 @keyframes mIn{from{opacity:0;transform:translateY(24px) scale(.96);}to{opacity:1;transform:none;}}
-.mbx h3{margin-bottom:17px;font-size:17px;font-weight:800;letter-spacing:-.4px;}
+.mbx h3{margin-bottom:17px;font-size:17px;font-weight:800;letter-spacing:-.4px;display:flex;align-items:center;gap:8px;}
+.mbx h3 svg{width:16px;height:16px;color:var(--g3);}
 .ma{display:flex;gap:9px;justify-content:flex-end;margin-top:19px;}
 #tc{position:fixed;bottom:20px;right:20px;z-index:400;display:flex;flex-direction:column;gap:9px;}
 .ts{padding:12px 17px;border-radius:12px;font-size:12.8px;font-weight:700;box-shadow:0 12px 34px rgba(0,0,0,.5);animation:tIn .35s cubic-bezier(.2,.8,.2,1);display:flex;gap:9px;align-items:center;min-width:230px;backdrop-filter:blur(14px);}
@@ -234,6 +240,15 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 .lr-m{flex:1;min-width:0;}
 .lr-m .t{font-size:12.8px;font-weight:600;}
 .lr-m .d{font-size:10.5px;color:var(--dim2);margin-top:3px;font-family:ui-monospace,monospace;}
+.ct-t{display:flex;align-items:center;gap:8px;}
+.ct-t svg{width:14px;height:14px;color:var(--g3);}
+.tick{display:flex;flex-shrink:0;color:var(--g3);margin-top:2px;}
+.tick svg{width:12px;height:12px;}
+.pod{display:flex;align-items:center;justify-content:center;gap:6px;font-weight:900;font-size:17px;letter-spacing:-.4px;}
+.pod svg{width:22px;height:22px;stroke-width:1.8;}
+.ts svg{width:14px;height:14px;flex-shrink:0;}
+.bg svg{width:12px;height:12px;}
+.pill svg{width:13px;height:13px;}
 .ct{padding:16px 19px;border-bottom:1px solid var(--line);font-size:13.5px;font-weight:800;display:flex;justify-content:space-between;align-items:center;letter-spacing:-.2px;}
 .kv{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.045);font-size:12.8px;}
 .kv:last-child{border:none;}
@@ -248,6 +263,7 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 .ring::before{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--panel);border:1px solid var(--line);}
 .ring-i{position:relative;z-index:2;text-align:center;}
 .ring-i .tm{font-size:31px;font-weight:900;letter-spacing:-1.6px;font-variant-numeric:tabular-nums;}
+.ring-i svg{width:44px;height:44px;opacity:.45;}
 .ring-i .lb{font-size:10px;color:var(--dim2);margin-top:3px;letter-spacing:.7px;text-transform:uppercase;font-weight:700;}
 .pill{display:inline-flex;align-items:center;gap:7px;padding:7px 17px;border-radius:30px;font-weight:800;font-size:12px;margin-bottom:19px;}
 .big{font-size:14.5px;padding:15px 34px;border-radius:14px;}
@@ -286,28 +302,21 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 <div id="login">
   <div class="lg-left">
     <div class="lg-brand">
-      <div class="lg-siren">🚨</div>
+      <div class="lg-siren"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17v-3.5a6 6 0 0 1 12 0V17"/><rect x="3.8" y="17" width="16.4" height="3.2" rx="1.6"/><path d="M12 3.2v2.1M4.7 6.6 6.2 8.1M19.3 6.6 17.8 8.1"/></svg></div>
       <h1>Notruf <span>Hamburg</span></h1>
       <p>Offizielles Verwaltungspanel für Team, Moderation und Ingame-Rechte des Roblox-RP-Projekts.</p>
-      <div class="lg-tags"><div class="lg-tag">🚓 Polizei</div><div class="lg-tag">🚒 Feuerwehr</div><div class="lg-tag">🚑 Rettungsdienst</div></div>
+      <div class="lg-tags"><div class="lg-tag"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.6 6.3 7.5A2 2 0 0 1 8.1 6.3h7.8a2 2 0 0 1 1.8 1.2L20 12.6"/><path d="M4 12.6h16v4.2a1 1 0 0 1-1 1h-1.3M4 12.6v4.2a1 1 0 0 0 1 1h1.3"/><circle cx="7.4" cy="18.2" r="1.5"/><circle cx="16.6" cy="18.2" r="1.5"/></svg>Polizei</div><div class="lg-tag"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.8c3.6 4.2 5.6 7.2 5.6 10.2a5.6 5.6 0 0 1-11.2 0C6.4 10 8.4 7 12 2.8z"/><path d="M12 19.4a3 3 0 0 0 3-3c0-1.6-1-3.4-3-5.6-2 2.2-3 4-3 5.6a3 3 0 0 0 3 3z"/></svg>Feuerwehr</div><div class="lg-tag"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9.6 3.2h4.8v6.4h6.4v4.8h-6.4v6.4H9.6v-6.4H3.2V9.6h6.4z"/></svg>Rettungsdienst</div></div>
     </div>
   </div>
   <div class="lg-right">
-    <div class="mrp">
-      <svg width="205" height="76" viewBox="0 0 205 76">
-        <polygon points="22,66 46,10 58,10 34,66" fill="#4ade80"/>
-        <polygon points="46,66 70,10 82,10 58,66" fill="#fff"/>
-        <text x="92" y="52" font-family="Arial Black,Arial" font-size="40" font-weight="900" fill="#4ade80">M</text>
-        <text x="130" y="52" font-family="Arial Black,Arial" font-size="40" font-weight="900" fill="#fff">RP</text>
-      </svg>
-    </div>
     <div class="lg-form">
+      <div class="lg-mark"><b>MRP</b><i></i><span>Notruf Hamburg</span></div>
       <h2>Anmeldung</h2><p class="s">Melde dich mit deinem Team-Konto an.</p>
       <div id="lerr"></div>
       <form onsubmit="return doLogin(event)">
         <div class="fg"><label>Benutzername</label><input class="inp" id="lu" placeholder="z. B. Chris" autocomplete="username" required></div>
         <div class="fg"><label>Passwort</label><input class="inp" id="lp" type="password" placeholder="••••••••" autocomplete="current-password" required></div>
-        <button class="btn b-g b-full" style="padding:13px;" type="submit">🛡️ Anmelden</button>
+        <button class="btn b-g b-full" style="padding:13px;" type="submit"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-8 9-4.5-1.5-8-4-8-9V5l8-3 8 3z"/><path d="m9 12 2 2 4-4"/></svg>Anmelden</button>
       </form>
       <div class="demo"><b>Demo-Zugänge:</b><br>Entwickler: Chris / mrpRHVO1<br>Owner: MaxOwner / owner123<br>Teamleitung: SaraTeamleitung / team123<br>Admin: MaxAdmin / admin123<br>Jr. Mod: LenaJrMod / jrmod123</div>
       <div class="lg-foot">© 2026 Notruf Hamburg · Entwickelt von <b>Christopher</b></div>
@@ -318,16 +327,16 @@ td.mono{font-family:ui-monospace,Menlo,monospace;font-size:11.5px;color:var(--di
 <!-- APP -->
 <div id="app" class="hidden">
   <aside id="sb">
-    <div class="sb-h"><div class="sb-logo">🚨</div><div><h1>Notruf Hamburg</h1><span>VERWALTUNGSPANEL</span></div></div>
+    <div class="sb-h"><div class="sb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 17v-3.5a6 6 0 0 1 12 0V17"/><rect x="3.8" y="17" width="16.4" height="3.2" rx="1.6"/><path d="M12 3.2v2.1M4.7 6.6 6.2 8.1M19.3 6.6 17.8 8.1"/></svg></div><div><h1>Notruf Hamburg</h1><span>VERWALTUNGSPANEL</span></div></div>
     <nav class="nav" id="nav"></nav>
-    <div class="sb-f"><button class="btn b-x b-full" onclick="doLogout()">🚪 Logout</button></div>
+    <div class="sb-f"><button class="btn b-x b-full" onclick="doLogout()"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button></div>
   </aside>
   <div id="main">
     <header id="top">
       <div style="display:flex;align-items:center;gap:12px;flex:1;">
-        <button class="mb" onclick="document.getElementById('sb').classList.toggle('open')">☰</button>
-        <div class="srch">${''}
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <button class="mb" onclick="document.getElementById('sb').classList.toggle('open')"><svg class="ti" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+        <div class="srch">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
           <input class="inp" id="gs" placeholder="Alles durchsuchen (Spieler, Discord, ID, Grund)..." onkeypress="if(event.key==='Enter')gsGo()">
         </div>
       </div>
@@ -383,7 +392,21 @@ const I={
  plus:'<path d="M12 5v14M5 12h14"/>',
  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
  srch:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+ x:'<path d="M6 6l12 12M18 6 6 18"/>',
  play:'<polygon points="6 3 20 12 6 21 6 3"/>',
+ siren:'<path d="M6 17v-3.5a6 6 0 0 1 12 0V17"/><rect x="3.8" y="17" width="16.4" height="3.2" rx="1.6"/><path d="M12 3.2v2.1M4.7 6.6 6.2 8.1M19.3 6.6 17.8 8.1"/>',
+ car:'<path d="M4 12.6 6.3 7.5A2 2 0 0 1 8.1 6.3h7.8a2 2 0 0 1 1.8 1.2L20 12.6"/><path d="M4 12.6h16v4.2a1 1 0 0 1-1 1h-1.3M4 12.6v4.2a1 1 0 0 0 1 1h1.3"/><circle cx="7.4" cy="18.2" r="1.5"/><circle cx="16.6" cy="18.2" r="1.5"/>',
+ flame:'<path d="M12 2.8c3.6 4.2 5.6 7.2 5.6 10.2a5.6 5.6 0 0 1-11.2 0C6.4 10 8.4 7 12 2.8z"/><path d="M12 19.4a3 3 0 0 0 3-3c0-1.6-1-3.4-3-5.6-2 2.2-3 4-3 5.6a3 3 0 0 0 3 3z"/>',
+ cross:'<path d="M9.6 3.2h4.8v6.4h6.4v4.8h-6.4v6.4H9.6v-6.4H3.2V9.6h6.4z"/>',
+ menu:'<path d="M4 7h16M4 12h16M4 17h16"/>',
+ inf:'<path d="M6.6 15.6a3.6 3.6 0 1 1 0-7.2c3.6 0 7.2 7.2 10.8 7.2a3.6 3.6 0 1 0 0-7.2c-3.6 0-7.2 7.2-10.8 7.2z"/>',
+ pin:'<path d="M12 21.2s6-5.4 6-10.2a6 6 0 1 0-12 0c0 4.8 6 10.2 6 10.2z"/><circle cx="12" cy="11" r="2.2"/>',
+ medal:'<circle cx="12" cy="14.6" r="5.4"/><path d="M9.1 3.2 12 8.4l2.9-5.2M12.7 12.4l-.7 1.6-1.8.2 1.3 1.3-.3 1.8 1.5-.9 1.5.9-.3-1.8 1.3-1.3-1.8-.2z"/>',
+ diamond:'<path d="M6.2 3.2h11.6l3.2 5.8-9 11.8-9-11.8z"/><path d="M3.4 9h17.2M9.6 3.2 6.4 9 12 20.8 17.6 9l-3.2-5.8"/>',
+ crown:'<path d="M3 8.2l3.6 3L12 5.2l5.4 6L21 8.2l-1.5 11.6h-15z"/>',
+ star:'<path d="m12 2.8 2.9 5.9 6.5 1-4.7 4.6 1.1 6.5L12 17.7l-5.8 3.1 1.1-6.5-4.7-4.6 6.5-1z"/>',
+ headset:'<path d="M4.4 14v-2.2a7.6 7.6 0 0 1 15.2 0V14"/><rect x="2.6" y="13.6" width="4" height="6" rx="1.6"/><rect x="17.4" y="13.6" width="4" height="6" rx="1.6"/><path d="M19.6 19.6v.4a2.6 2.6 0 0 1-2.6 2.6h-3.4"/>',
+ code:'<path d="m9 8-5 4 5 4M15 8l5 4-5 4"/>',
  stop:'<rect width="14" height="14" x="5" y="5" rx="2"/>'
 };
 const svg=(n,c='')=>`<svg class="${c}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${I[n]||''}</svg>`;
@@ -394,21 +417,21 @@ const ORDER=["Owner","Co. Owner","Supervisor","Projektleitung","Stv. Projektleit
 "LTD.Administrator","Head Administrator","Sr. Administrator","Admin","Jr. Admin","Head Mod","Mod","Jr. Mod",
 "Head Supporter","Supporter","Test Supporter"];
 const EB=[
- {n:"Leitungsebene",l:6,rg:"1–3",ic:"💎",d:"Vollzugriff auf alle Bereiche und Bearbeitung.",roles:["Owner","Co. Owner","Supervisor"],
+ {n:"Leitungsebene",l:6,rg:"1–3",ic:"diamond",d:"Vollzugriff auf alle Bereiche und Bearbeitung.",roles:["Owner","Co. Owner","Supervisor"],
   p:["Zugriff auf alle Seiten und Bereiche","Sicherheit & Audit einsehbar","Rang-Info bearbeiten","Benutzerverwaltung vollständig","Ingame-Rechte vergeben"]},
- {n:"High Rank",l:5,rg:"4–7",ic:"👑",d:"Zugriff auf alle Team- und Serververwaltungsbereiche inkl. Bearbeitung.",roles:["Projektleitung","Stv. Projektleitung","Serverleitung","Stv. Serverleitung"],
+ {n:"High Rank",l:5,rg:"4–7",ic:"crown",d:"Zugriff auf alle Team- und Serververwaltungsbereiche inkl. Bearbeitung.",roles:["Projektleitung","Stv. Projektleitung","Serverleitung","Stv. Serverleitung"],
   p:["Benutzerverwaltung: Konten erstellen, bearbeiten, löschen","Logs einsehbar (vollständiges Aktivitätsprotokoll)","System-Status prüfbar","Alle Highteam- + Administrator- + Moderationsbereiche"]},
- {n:"Highteam",l:4,rg:"8–15",ic:"⭐",d:"Teamverwaltung, Schichten, Moderation und weitere notwendige Bereiche.",roles:["Manager","Stv. Manager","Designing Manager","Servermanagement","Stv. Servermanagement","LTD.Teamleitung","Teamleitung","Stv. Teamleitung"],
+ {n:"Highteam",l:4,rg:"8–15",ic:"star",d:"Teamverwaltung, Schichten, Moderation und weitere notwendige Bereiche.",roles:["Manager","Stv. Manager","Designing Manager","Servermanagement","Stv. Servermanagement","LTD.Teamleitung","Teamleitung","Stv. Teamleitung"],
   p:["Schicht-Verwaltung aller Mitglieder","Statistik einsehbar","Abwesenheiten genehmigen","Handbuch, Regeln & Dokumente pflegen","Alle Moderationsbereiche"]},
- {n:"Administrator",l:3,rg:"16–20",ic:"🛡️",d:"Erweiterte Moderation inkl. Statistik und Schichtübersicht.",roles:["LTD.Administrator","Head Administrator","Sr. Administrator","Admin","Jr. Admin"],
+ {n:"Administrator",l:3,rg:"16–20",ic:"shield",d:"Erweiterte Moderation inkl. Statistik und Schichtübersicht.",roles:["LTD.Administrator","Head Administrator","Sr. Administrator","Admin","Jr. Admin"],
   p:["Warns, Bans, Blacklist, Archiv","Statistik einsehbar","Schicht-Verwaltung einsehbar","Abwesenheiten verwalten"]},
- {n:"Moderator",l:2,rg:"21–23",ic:"🔨",d:"Moderationsbereiche für den täglichen Serverbetrieb.",roles:["Head Mod","Mod","Jr. Mod"],
+ {n:"Moderator",l:2,rg:"21–23",ic:"hammer",d:"Moderationsbereiche für den täglichen Serverbetrieb.",roles:["Head Mod","Mod","Jr. Mod"],
   p:["Warns erstellen & verwalten","Bans erstellen & aufheben","Blacklist-Einträge","Archiv einsehbar"]},
- {n:"Supporter",l:1,rg:"24–26",ic:"🎧",d:"Basiszugriff: Schicht, Team, Leaderboard und Informationen.",roles:["Head Supporter","Supporter","Test Supporter"],
+ {n:"Supporter",l:1,rg:"24–26",ic:"headset",d:"Basiszugriff: Schicht, Team, Leaderboard und Informationen.",roles:["Head Supporter","Supporter","Test Supporter"],
   p:["Eigene Schicht tracken","Team-Übersicht & Leaderboard","Handbuch, Regeln, Ankündigungen","Abwesenheit melden"]}
 ];
 const rankNr=r=>r==="Entwickler"?0:ORDER.indexOf(r)+1;
-const ebOf=r=>r==="Entwickler"?{n:"Entwickler",l:99,ic:"👨‍💻"}:(EB.find(e=>e.roles.includes(r))||EB[5]);
+const ebOf=r=>r==="Entwickler"?{n:"Entwickler",l:99,ic:"code"}:(EB.find(e=>e.roles.includes(r))||EB[5]);
 const lvlOf=r=>ebOf(r).l;
 const RC={"Owner":"#f59e0b","Co. Owner":"#f59e0b","Supervisor":"#f59e0b","Entwickler":"#f59e0b",
 "Projektleitung":"#ef4444","Stv. Projektleitung":"#ef4444","Serverleitung":"#ec4899","Stv. Serverleitung":"#ec4899",
@@ -439,12 +462,12 @@ const pg=k=>S.pg[k]||1, spg=(k,v)=>{S.pg[k]=v;rt();};
 
 /* ============ UI HELPERS ============ */
 function toast(m,t='s'){const c=document.getElementById('tc'),e=document.createElement('div');
- e.className='ts '+t;e.innerHTML=(t==='s'?'✅':t==='e'?'⚠️':'ℹ️')+' '+m;c.appendChild(e);
+ e.className='ts '+t;e.innerHTML=svg(t==='s'?'chk':t==='e'?'warn':'bell')+'<span>'+m+'</span>';c.appendChild(e);
  setTimeout(()=>{e.style.transition='.3s';e.style.opacity=0;e.style.transform='translateX(40px)';setTimeout(()=>e.remove(),300);},2900);}
 function modal(h){const o=document.getElementById('mo');o.innerHTML=`<div class="mbx">${h}</div>`;o.classList.add('on');}
 function cm(){document.getElementById('mo').classList.remove('on');}
 let _cf=null;
-function ask(m,fn){_cf=fn;modal(`<h3>⚠️ Bestätigung</h3><p style="color:var(--dim);font-size:13px;line-height:1.6">${m}</p>
+function ask(m,fn){_cf=fn;modal(`<h3>${svg('warn')}Bestätigung</h3><p style="color:var(--dim);font-size:13px;line-height:1.6">${m}</p>
 <div class="ma"><button class="btn b-x" onclick="cm()">Abbrechen</button><button class="btn b-r" onclick="_cf();cm()">Ja, ausführen</button></div>`);}
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const ini=n=>(n||'?').slice(0,2).toUpperCase();
@@ -474,7 +497,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('.btn');if(!b)ret
 async function doLogin(e){e.preventDefault();
  try{const d=await api('/auth/login',{method:'POST',body:JSON.stringify({username:lu.value,password:lp.value})});
   localStorage.setItem('nh_t',d.token);ME=d.user;lerr.innerHTML='';location.hash='dashboard';rt();
- }catch(x){lerr.innerHTML=`<div class="lg-err">❌ ${esc(x.message)}</div>`;}
+ }catch(x){lerr.innerHTML=`<div class="lg-err">${svg('warn')}<span>${esc(x.message)}</span></div>`;}
  return false;}
 async function doLogout(){try{await api('/auth/logout',{method:'POST'});}catch{} localStorage.removeItem('nh_t');ME=null;location.hash='';rt();}
 async function me(){if(!tk())return null;if(ME)return ME;try{ME=(await api('/auth/me')).user;return ME;}catch{return null;}}
@@ -543,7 +566,7 @@ async function rt(){
  trl.innerHTML=`<span class="bg" style="background:${RC[u.role]||'#64748b'};color:#fff;border:none;padding:1.5px 8px;font-size:9.5px">${u.role}</span>`;
  ct.innerHTML=`<div class="g gs">${'<div class="sk" style="height:96px"></div>'.repeat(4)}</div>`;
  try{await (PG[p]||PG.dashboard)(u,arg);anim();}
- catch(e){ct.innerHTML=ph('warn','Fehler','Aktion fehlgeschlagen')+`<div class="card cpad" style="color:#ff8d80">⚠️ ${esc(e.message)}</div>`;}
+ catch(e){ct.innerHTML=ph('warn','Fehler','Aktion fehlgeschlagen')+`<div class="card cpad" style="color:#ff8d80;display:flex;align-items:center;gap:9px">${svg('warn')}<span>${esc(e.message)}</span></div>`;}
 }
 addEventListener('hashchange',rt);
 
@@ -598,11 +621,11 @@ function sBox(d){const b=document.getElementById('sbx');if(!b)return;
    <button class="btn b-x" onclick="ask('Schicht wirklich beenden? Danach gilt ein 10-Minuten-Cooldown.',endS)">${svg('stop')} Beenden</button></div>`;
   if(rem<=0)setTimeout(PG.shift,1400);
  }else if(d.cooldownRemaining>0){const r=d.cooldownRemaining;
-  b.innerHTML=`<span class="pill bg-o">⏳ Cooldown aktiv</span>
+  b.innerHTML=`<span class="pill bg-o">${svg('clock')}Cooldown aktiv</span>
   <div class="ring" style="--p:${100-r/600000*100}"><div class="ring-i"><div class="tm">${hms(r).slice(3)}</div><div class="lb">bis neue Schicht</div></div></div>
   <p style="color:var(--dim);font-size:12.5px;max-width:420px;margin:0 auto">Zum Schutz vor Missbrauch kannst du erst 10 Minuten nach Schichtende eine neue Schicht starten.</p>`;
  }else{
-  b.innerHTML=`<span class="pill bg-x">⚪ Keine aktive Schicht</span>
+  b.innerHTML=`<span class="pill bg-x"><span class="dot" style="background:#7d879c"></span>Keine aktive Schicht</span>
   <div class="ring" style="--p:0"><div class="ring-i"><div class="tm" style="font-size:38px">${svg('clock')}</div></div></div>
   <p style="color:var(--dim);font-size:12.8px;max-width:440px;margin:0 auto 22px;line-height:1.6">Starte deine Schicht, um Aktivität zu tracken. Danach musst du <b style="color:#fff">jede Stunde bestätigen</b> – sonst wird die Schicht automatisch beendet.</p>
   <button class="btn b-g big" onclick="stS()">${svg('play')} Schicht starten</button>`;}}
@@ -671,7 +694,7 @@ PG.warns=async()=>{
    <div class="fg"><label>Notiz (optional)</label><input class="inp" id="wn"></div></div>
    <button class="btn b-g">${svg('plus')} Verwarnung speichern</button></form></div>
  <div class="card cpad"><div class="tb">
-  <input class="inp" placeholder="🔍 Spieler suchen..." value="${esc(f.q)}" oninput="S.f.w={...f,q:this.value};S.pg.w=1;PG.warns()">
+  <input class="inp" placeholder="Spieler suchen..." value="${esc(f.q)}" oninput="S.f.w={...f,q:this.value};S.pg.w=1;PG.warns()">
   <input class="inp" type="date" value="${f.d}" onchange="S.f.w={...f,d:this.value};S.pg.w=1;PG.warns()">
   ${f.d?`<button class="btn b-x b-s" onclick="S.f.w={...f,d:''};PG.warns()">Filter löschen</button>`:''}
   <span class="bg bg-g" style="margin-left:auto">${warns.length} Einträge</span></div>
@@ -698,7 +721,7 @@ async function delW(id){try{await api('/warns/'+id,{method:'DELETE'});toast('War
 PG.bans=async()=>{
  const f=S.f.b||{q:''};const {bans}=await api(`/bans?q=${encodeURIComponent(f.q)}`);
  const bb=s=>s==='Aktiv'?'<span class="bg bg-r"><span class="dot dot-r"></span>Aktiv</span>':
-  s==='Permanent'?'<span class="bg bg-p">♾️ Permanent</span>':'<span class="bg bg-g">Abgelaufen</span>';
+  s==='Permanent'?'<span class="bg bg-p">'+svg('inf')+' Permanent</span>':'<span class="bg bg-g">Abgelaufen</span>';
  ct.innerHTML=ph('hammer','Ban-System','Temporäre und permanente Sperren verwalten')+`
  <div class="card cpad" style="margin-bottom:17px"><div class="sl" style="margin-top:0">Neuen Ban erstellen</div>
   <form onsubmit="return addB(event)"><div class="r2">
@@ -713,11 +736,11 @@ PG.bans=async()=>{
     <option value="weeks">Wochen</option><option value="months">Monate</option></select></div></div>
    <div class="fg"><label>Zusätzliche Informationen</label><textarea class="inp" id="bn"></textarea></div>
    <button class="btn b-g">${svg('hammer')} Ban erstellen</button></form></div>
- <div class="card cpad"><div class="tb"><input class="inp" placeholder="🔍 Spieler suchen..." value="${esc(f.q)}" oninput="S.f.b={q:this.value};S.pg.b=1;PG.bans()">
+ <div class="card cpad"><div class="tb"><input class="inp" placeholder="Spieler suchen..." value="${esc(f.q)}" oninput="S.f.b={q:this.value};S.pg.b=1;PG.bans()">
   <span class="bg bg-r" style="margin-left:auto">${bans.filter(b=>b.status!=='Abgelaufen').length} aktiv</span></div>
   ${table(['Spieler','Grund','Start','Dauer','Ende','Status','Bearbeiter',''],page(bans,'b').map(b=>`<tr>
    <td><b>${esc(b.player)}</b></td><td>${esc(b.reason)}</td><td class="mono">${b.startDate} ${b.startTime}</td>
-   <td>${b.type==='permanent'?'♾️':esc(b.duration+' '+b.durationUnit)}</td><td class="mono">${b.endDateTime?fdt(b.endDateTime):'—'}</td>
+   <td>${b.type==='permanent'?svg('inf'):esc(b.duration+' '+b.durationUnit)}</td><td class="mono">${b.endDateTime?fdt(b.endDateTime):'—'}</td>
    <td>${bb(b.status)}</td><td>${esc(b.moderator)}</td>
    <td><button class="icb dz" onclick="ask('Ban von <b>${esc(b.player)}</b> aufheben?',()=>delB('${b.id}'))">${svg('trash')}</button></td></tr>`))}
   ${pager(bans.length,'b')}</div>`;
@@ -744,17 +767,17 @@ async function delBL(id){try{await api('/blacklist/'+id,{method:'DELETE'});toast
 PG.archive=async()=>{const{items}=await api('/archive');
  ct.innerHTML=ph('arch','Archiv','Vollständiges Archiv aller Warns & Bans')+`<div class="card cpad">
  ${table(['Typ','Spieler','Grund','Datum','Bearbeiter','Status'],page(items,'ar').map(i=>`<tr>
-  <td>${i.kind==='Warn'?'<span class="bg bg-o">⚠️ Warn</span>':'<span class="bg bg-r">🔨 Ban</span>'}</td>
+  <td>${i.kind==='Warn'?'<span class="bg bg-o">'+svg('warn')+' Warn</span>':'<span class="bg bg-r">'+svg('hammer')+' Ban</span>'}</td>
   <td><b>${esc(i.player)}</b></td><td>${esc(i.reason)}</td><td class="mono">${i.date||i.startDate}</td><td>${esc(i.moderator)}</td>
   <td>${i.status?`<span class="bg ${i.status==='Abgelaufen'?'bg-g':'bg-r'}">${i.status}</span>`:'—'}</td></tr>`))}
  ${pager(items.length,'ar')}</div>`;};
 
 /* ============ LEADERBOARD ============ */
 PG.leaderboard=async()=>{const d=await api('/leaderboard');
- const podium=(a,k,l)=>{const m=['🥇','🥈','🥉'],cl=['#f59e0b','#94a3b8','#b45309'];
+ const podium=(a,k,l)=>{const cl=['#f59e0b','#94a3b8','#b45309'];
   return `<div class="g g4" style="margin-bottom:17px">${a.slice(0,3).map((e,i)=>`
   <div class="card hv cpad" style="text-align:center;border-color:${cl[i]}44;box-shadow:0 0 30px ${cl[i]}18">
-   <div style="font-size:30px">${m[i]}</div><div class="av av-md" style="margin:9px auto;background:linear-gradient(135deg,${RC[e.role]||'#22c55e'},#0891b2)">${ini(e.name)}</div>
+   <div class="pod" style="color:${cl[i]}">${svg('trophy')}<span>${i+1}</span></div><div class="av av-md" style="margin:9px auto;background:linear-gradient(135deg,${RC[e.role]||'#22c55e'},#0891b2)">${ini(e.name)}</div>
    <h4 style="font-size:15px;font-weight:800">${esc(e.name)}</h4><div style="margin:6px 0">${rb(e.role)}</div>
    <div style="font-size:26px;font-weight:900;color:${cl[i]};letter-spacing:-1px" data-cnt="${e[k]}">0</div>
    <p style="font-size:10.5px;color:var(--dim)">${l}</p></div>`).join('')}</div>`;};
@@ -777,7 +800,7 @@ PG.statistik=async()=>{const s=await api('/stats');
 PG.team=async()=>{const{team}=await api('/team');const q=(S.f.pq||'').toLowerCase();
  const l=team.filter(u=>!q||u.username.toLowerCase().includes(q)||(u.discord||'').toLowerCase().includes(q)||(u.discordId||'').includes(q));
  ct.innerHTML=ph('users','Team-Übersicht','Alle aktiven Teammitglieder nach Hierarchie sortiert')+`
- <div class="card cpad"><div class="tb"><input class="inp" placeholder="🔍 Name, Discord oder ID..." value="${esc(S.f.pq||'')}" oninput="S.f.pq=this.value;PG.team()">
+ <div class="card cpad"><div class="tb"><input class="inp" placeholder="Name, Discord oder ID..." value="${esc(S.f.pq||'')}" oninput="S.f.pq=this.value;PG.team()">
   <span class="bg bg-g" style="margin-left:auto">${l.length} Mitglieder</span></div>
  <div class="g g3">${l.map(u=>`<div class="card hv uc"><div class="uc-h">
   <div class="av av-md" style="background:linear-gradient(135deg,${RC[u.role]||'#22c55e'},#0891b2)">${ini(u.username)}</div>
@@ -800,7 +823,7 @@ PG.rights=async u=>{const{rights}=await api('/rights');
   <td>${esc(r.assignedBy)}</td><td class="mono">${r.date}</td>
   <td>${canEdit(u,r.role)?`<button class="icb" onclick="edR('${r.id}')">${svg('pen')}</button>
    <button class="icb dz" onclick="ask('Recht für <b>${esc(r.robloxName)}</b> entfernen?',()=>delR('${r.id}'))">${svg('trash')}</button>`
-   :'<span style="font-size:10.5px;color:var(--dim2)">🔒 Geschützt</span>'}</td></tr>`))}</div>`;};
+   :'<span style="font-size:10.5px;color:var(--dim2);display:inline-flex;align-items:center;gap:5px">'+svg('lock')+' Geschützt</span>'}</td></tr>`))}</div>`;};
 async function addR(e){e.preventDefault();try{await api('/rights',{method:'POST',body:JSON.stringify({discordName:rd.value,discordId:ri.value,robloxName:rr.value,role:rl.value})});
  toast('Ingame-Recht vergeben');PG.rights(ME);}catch(x){toast(x.message,'e');}return false;}
 async function edR(id){const{rights}=await api('/rights');const r=rights.find(x=>x.id===id);
@@ -824,7 +847,7 @@ PG.users=async u=>{const{users}=await api('/users');
     <button class="icb" title="Passwort" onclick="pwM('${x.id}','${esc(x.username)}')">${svg('key')}</button>
     <button class="icb" title="${x.active?'Deaktivieren':'Aktivieren'}" onclick="tgU('${x.id}')">${svg('pow')}</button>
     <span class="sp"></span><button class="icb dz" onclick="ask('Benutzer <b>${esc(x.username)}</b> löschen?',()=>delU('${x.id}'))">${svg('trash')}</button>`
-    :`<span style="font-size:11px;color:var(--dim2)">🔒 Geschützt – gleich- oder höherrangig</span>`}</div></div>`;}).join('')}</div>`;};
+    :`<span style="font-size:11px;color:var(--dim2);display:inline-flex;align-items:center;gap:5px">${svg('lock')} Geschützt – gleich- oder höherrangig</span>`}</div></div>`;}).join('')}</div>`;};
 function nuM(){modal(`<h3>${svg('plus')} Neuen Benutzer erstellen</h3>
  <div class="fg"><label>Benutzername</label><input class="inp" id="nu1" required></div>
  <div class="fg"><label>Passwort</label><input class="inp" type="password" id="nu2" required></div>
@@ -853,7 +876,7 @@ PG.security=async()=>{const{sessions}=await api('/security/sessions');const{logs
  const q=(S.f.sq||'').toLowerCase();
  const items=logs.filter(l=>/Login|Logout|Benutzer|Passwort|Rolle|gelöscht/i.test(l.action)).filter(l=>!q||JSON.stringify(l).toLowerCase().includes(q));
  ct.innerHTML=ph('ushield','Audit-Übersicht','Login-Versuche und kritische administrative Aktionen')+`
- <div class="card cpad" style="margin-bottom:17px"><div class="tb"><input class="inp" style="flex:1;max-width:420px" placeholder="🔍 Durchsuchen..." value="${esc(S.f.sq||'')}" oninput="S.f.sq=this.value;PG.security()"></div>
+ <div class="card cpad" style="margin-bottom:17px"><div class="tb"><input class="inp" style="flex:1;max-width:420px" placeholder="Durchsuchen..." value="${esc(S.f.sq||'')}" oninput="S.f.sq=this.value;PG.security()"></div>
  <div class="lst">${items.slice(0,40).map(l=>`<div class="lr">
   <span class="dot ${/fehlgeschlagen/i.test(l.action)?'dot-r':'dot-g'}"></span>
   <div class="lr-m"><div class="t"><b>${esc(l.user)}</b> · <span style="color:var(--dim)">${esc(l.role)}</span> · ${esc(l.action)}${l.target&&l.target!=='-'?` · <span style="color:var(--g3)">${esc(l.target)}</span>`:''}</div>
@@ -865,7 +888,7 @@ PG.security=async()=>{const{sessions}=await api('/security/sessions');const{logs
 
 PG.logs=async()=>{const q=S.f.lq||'';const{logs}=await api('/logs?q='+encodeURIComponent(q));
  ct.innerHTML=ph('logs','Aktivitätsprotokoll','Vollständiges, unveränderliches Logbuch aller Aktionen')+`
- <div class="card cpad"><div class="tb"><input class="inp" style="flex:1;max-width:440px" placeholder="🔍 Logs durchsuchen..." value="${esc(q)}" oninput="S.f.lq=this.value;S.pg.lg=1;PG.logs()">
+ <div class="card cpad"><div class="tb"><input class="inp" style="flex:1;max-width:440px" placeholder="Logs durchsuchen..." value="${esc(q)}" oninput="S.f.lq=this.value;S.pg.lg=1;PG.logs()">
   <span class="bg bg-g" style="margin-left:auto">${logs.length} Einträge</span></div>
  <div class="lst">${page(logs,'lg').map(l=>`<div class="lr">
   <div class="av av-sm" style="background:linear-gradient(135deg,${RC[l.role]||'#22c55e'},#0891b2)">${ini(l.user)}</div>
@@ -896,7 +919,7 @@ async function cPage(type,ic,title,sub,u){
  `<div class="g" style="gap:13px">${items.length?items.map(i=>`<div class="card hv cpad">
   <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
    <div style="display:flex;gap:12px;align-items:center"><div class="t-ic" style="width:36px;height:36px">${svg(ic)}</div>
-   <div><h4 style="font-size:15px;font-weight:800">${i.pinned?'📌 ':''}${esc(i.title)}</h4>
+   <div><h4 style="font-size:15px;font-weight:800">${i.pinned?svg('pin')+' ':''}${esc(i.title)}</h4>
    <p style="font-size:10.5px;color:var(--dim2);margin-top:3px">${esc(i.author)} · ${i.date}</p></div></div>
    ${ok?`<button class="icb dz" onclick="ask('Eintrag löschen?',()=>dcM('${type}','${i.id}'))">${svg('trash')}</button>`:''}</div>
   <p style="font-size:13px;white-space:pre-line;line-height:1.75;margin-top:13px;color:#cfd6e2">${esc(i.body)}</p></div>`).join(''):
@@ -933,9 +956,10 @@ PG.absences=async u=>{const{absences}=await api('/absences');const mg=u.isDevelo
   <button class="btn b-g">${svg('plus')} Abwesenheit melden</button></form></div>
  <div class="card cpad">${table(['Mitglied','Von','Bis','Grund','Status',mg?'Aktionen':''],absences.map(a=>`<tr>
   <td><b>${esc(a.username)}</b></td><td class="mono">${a.from}</td><td class="mono">${a.to}</td><td>${esc(a.reason)}</td>
-  <td>${a.status==='approved'?'<span class="bg bg-g">✓ Genehmigt</span>':a.status==='rejected'?'<span class="bg bg-r">✕ Abgelehnt</span>':'<span class="bg bg-o">⏳ Ausstehend</span>'}</td>
+  <td>${aBadge(a.status)}</td>
   <td>${mg&&a.status==='pending'?`<button class="icb" onclick="stA('${a.id}','approved')">${svg('chk')}</button>
    <button class="icb dz" onclick="stA('${a.id}','rejected')">${svg('ban')}</button>`:''}</td></tr>`))}</div>`;};
+const aBadge=s=>s==='approved'?'<span class="bg bg-g">'+svg('chk')+'Genehmigt</span>':s==='rejected'?'<span class="bg bg-r">'+svg('x')+'Abgelehnt</span>':'<span class="bg bg-o">'+svg('clock')+'Ausstehend</span>';
 async function addA(e){e.preventDefault();try{await api('/absences',{method:'POST',body:JSON.stringify({from:a1.value,to:a2.value,reason:a3.value})});
  toast('Abwesenheit gemeldet');PG.absences(ME);}catch(x){toast(x.message,'e');}return false;}
 async function stA(id,s){try{await api('/absences/'+id,{method:'PUT',body:JSON.stringify({status:s})});toast('Aktualisiert');PG.absences(ME);}catch(e){toast(e.message,'e');}}
@@ -950,14 +974,14 @@ PG.rankinfo=async u=>{
  ${eb.map((e,i)=>`<div class="card hv cpad" style="margin-bottom:13px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:11px;gap:10px;flex-wrap:wrap">
    <div style="display:flex;align-items:center;gap:11px"><span class="num" style="width:auto;padding:0 9px">${e.rg}</span>
-   <h4 style="font-size:16px;font-weight:800">${e.ic} ${esc(e.n)}</h4></div>
+   <h4 style="font-size:16px;font-weight:800">${I[e.ic]?svg(e.ic):e.ic} ${esc(e.n)}</h4></div>
    <span class="bg bg-g">Level ${e.l}</span></div>
   <p style="font-size:12.5px;color:var(--dim);line-height:1.65;margin-bottom:12px">${esc(e.d)}</p>
   <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:13px">${e.roles.map(r=>`<span class="chip">${esc(r)}</span>`).join('')}</div>
   <div style="border-top:1px solid var(--line);padding-top:11px">
-   ${e.p.map(x=>`<div style="font-size:12px;color:#c3cbd8;padding:3.5px 0;display:flex;gap:8px"><span style="color:var(--g3)">✓</span>${esc(x)}</div>`).join('')}</div></div>`).join('')}
+   ${e.p.map(x=>`<div style="font-size:12px;color:#c3cbd8;padding:3.5px 0;display:flex;gap:8px"><span class="tick">${I['chk']?'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'+I['chk']+'</svg>':''}</span>${esc(x)}</div>`).join('')}</div></div>`).join('')}
  </div>
- <div class="card" style="position:sticky;top:78px"><div class="ct">🚨 Vollständige Hierarchie</div>
+ <div class="card" style="position:sticky;top:78px"><div class="ct"><span class="ct-t">${svg('siren')}Vollständige Hierarchie</span></div>
   <div style="padding:10px;max-height:66vh;overflow-y:auto">
   <div class="rk"><span class="rk-n">#0</span><span class="rk-b" style="background:#f59e0b"></span><b style="font-size:12.5px">Entwickler</b></div>
   ${ORDER.map((r,i)=>`<div class="rk"><span class="rk-n">#${i+1}</span><span class="rk-b" style="background:${RC[r]}"></span>
@@ -978,7 +1002,7 @@ async function chPw(e){e.preventDefault();if(p2.value!==p3.value){toast('Passwö
 PG.settings=async u=>{const d=await api('/settings');
  ct.innerHTML=ph('cog','Einstellungen','Konto- & Systeminformationen')+`
  <div class="g g2" style="align-items:start">
- <div class="card"><div class="ct">${svg('shield')} Dein Konto</div><div class="cpad">
+ <div class="card"><div class="ct"><span class="ct-t">${svg('shield')}Dein Konto</span></div><div class="cpad">
   <div style="display:flex;gap:13px;align-items:center;margin-bottom:15px">
    <div class="av av-md">${ini(u.username)}</div><div><b style="font-size:15px">${esc(u.username)}</b><div style="margin-top:5px">${rb(u.role)}</div></div></div>
   <div class="kv"><span class="k">Discord</span><span class="v">${esc(u.discord||'—')}</span></div>
@@ -986,14 +1010,14 @@ PG.settings=async u=>{const d=await api('/settings');
   <div class="kv"><span class="k">Hierarchie-Level</span><span class="v">#${rankNr(u.role)}</span></div>
   <div class="kv"><span class="k">Ebene</span><span class="v">${ebOf(u.role).n}</span></div>
   <div style="display:flex;gap:7px;margin-top:13px;flex-wrap:wrap">
-   ${lvlOf(u.role)>=5||u.isDeveloper?'<span class="bg bg-g">✓ Vollzugriff</span>':''}
-   ${lvlOf(u.role)>=2||u.isDeveloper?'<span class="bg bg-g">✓ Moderation</span>':''}
-   ${u.isDeveloper?'<span class="bg bg-o">✓ Entwickler</span>':''}</div>
+   ${lvlOf(u.role)>=5||u.isDeveloper?'<span class="bg bg-g">'+svg('chk')+'Vollzugriff</span>':''}
+   ${lvlOf(u.role)>=2||u.isDeveloper?'<span class="bg bg-g">'+svg('chk')+'Moderation</span>':''}
+   ${u.isDeveloper?'<span class="bg bg-o">'+svg('chk')+'Entwickler</span>':''}</div>
   <div style="margin-top:17px;padding-top:15px;border-top:1px solid var(--line)">
    <label style="display:flex;align-items:center;gap:10px;font-size:12.8px;cursor:pointer">
     <input type="checkbox" ${d.settings.maintenance?'checked':''} onchange="mtn(this.checked)" style="width:16px;height:16px;accent-color:var(--g)"> Wartungsmodus aktivieren</label></div>
   </div></div>
- <div class="card"><div class="ct">🚨 Rollen-Hierarchie</div><div style="padding:10px;max-height:60vh;overflow-y:auto">
+ <div class="card"><div class="ct"><span class="ct-t">${svg('siren')}Rollen-Hierarchie</span></div><div style="padding:10px;max-height:60vh;overflow-y:auto">
   <div class="rk"><span class="rk-n">#0</span><span class="rk-b" style="background:#f59e0b"></span><b style="font-size:12.5px">Entwickler</b></div>
   ${ORDER.map((r,i)=>`<div class="rk"><span class="rk-n">#${i+1}</span><span class="rk-b" style="background:${RC[r]}"></span>
    <span style="font-size:12.5px;${r===u.role?'color:var(--g3);font-weight:700':''}">${esc(r)}</span></div>`).join('')}</div></div></div>`;};
